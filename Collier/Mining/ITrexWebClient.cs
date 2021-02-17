@@ -4,8 +4,9 @@ namespace MiningAutomater.Mining
 {
     public interface ITrexWebClient
     {
-        Task<bool> IsRunningAsync();
+        Task<bool> IsMiningAsync();
         void PauseAsync();
         void ResumeAsync();
+        Task<bool> IsRunningAsync();
     }
 }
