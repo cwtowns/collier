@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public interface IGpuMonitor
     {

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CollierService", "MiningAutomater\CollierService.csproj", "{85475376-6814-4699-9A56-08136E91E84A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CollierService", "Collier\CollierService.csproj", "{85475376-6814-4699-9A56-08136E91E84A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CollierTests", "MiningAutomaterTests\CollierTests.csproj", "{115DB043-526E-4B23-9C79-2716A9A9D6A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CollierTests", "CollierTests\CollierTests.csproj", "{115DB043-526E-4B23-9C79-2716A9A9D6A1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestingUtilities", "TestingUtilities\TestingUtilities.csproj", "{ABC479BB-81A5-4328-B33F-14BE70A0EF9A}"
 EndProject

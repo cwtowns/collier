@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MiningAutomater.Monitoring.Idle
+namespace Collier.Monitoring.Idle
 {
     public class IdleEvent
     {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public interface INvidiaSmiParser
     {

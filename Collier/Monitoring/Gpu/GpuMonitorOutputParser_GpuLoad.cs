@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public class GpuMonitorOutputParser_GpuLoad : IGpuMonitorOutputParser
     {

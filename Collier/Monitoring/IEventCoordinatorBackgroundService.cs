@@ -1,8 +1,8 @@
-﻿using MiningAutomater.Host;
-using MiningAutomater.Monitoring.Gpu;
-using MiningAutomater.Monitoring.Idle;
+﻿using Collier.Host;
+using Collier.Monitoring.Gpu;
+using Collier.Monitoring.Idle;
 
-namespace MiningAutomater.Monitoring
+namespace Collier.Monitoring
 {
     public interface IEventCoordinatorBackgroundService : IBackgroundService
     {

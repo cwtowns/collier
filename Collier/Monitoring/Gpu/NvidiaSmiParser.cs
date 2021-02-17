@@ -1,10 +1,10 @@
-﻿using MiningAutomater.IO;
+﻿using Collier.IO;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public class NvidiaSmiParser : INvidiaSmiParser
     {

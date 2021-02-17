@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.Host;
-using MiningAutomater.Mining;
-using MiningAutomater.Monitoring.Gpu;
-using MiningAutomater.Monitoring.Idle;
+using Collier.Host;
+using Collier.Mining;
+using Collier.Monitoring.Gpu;
+using Collier.Monitoring.Idle;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Monitoring
+namespace Collier.Monitoring
 {
     public class EventCoordinatorBackgroundService : IEventCoordinatorBackgroundService, IBackgroundService<EventCoordinatorBackgroundService>
     {

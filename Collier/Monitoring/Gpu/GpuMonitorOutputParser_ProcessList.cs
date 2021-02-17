@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public class GpuMonitorOutputParser_ProcessList : IGpuMonitorOutputParser
     {

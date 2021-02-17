@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.IO;
+using Collier.IO;
 using System;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public class NvidiaSmiExecutor : INvidiaSmiExecutor
     {

@@ -1,7 +1,7 @@
-﻿using MiningAutomater.Host;
+﻿using Collier.Host;
 using System;
 
-namespace MiningAutomater.Monitoring.Idle
+namespace Collier.Monitoring.Idle
 {
     public interface IIdleMonitorBackgroundService : IBackgroundService
     {

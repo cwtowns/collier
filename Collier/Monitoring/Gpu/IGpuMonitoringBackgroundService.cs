@@ -1,7 +1,7 @@
-﻿using MiningAutomater.Host;
+﻿using Collier.Host;
 using System;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public interface IGpuMonitoringBackgroundService : IBackgroundService
     {

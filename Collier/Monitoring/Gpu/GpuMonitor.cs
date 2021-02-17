@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public class GpuMonitor : IGpuMonitor
     {

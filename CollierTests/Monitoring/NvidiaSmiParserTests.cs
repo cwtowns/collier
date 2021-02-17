@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
-using MiningAutomater.Monitoring.Gpu;
+using Collier.Monitoring.Gpu;
 using Newtonsoft.Json.Linq;
 using System.Text;
 using Xunit;
 
-namespace MiningAutomaterTests.Monitoring
+namespace CollierTests.Monitoring
 {
     public class Monitoring
     {

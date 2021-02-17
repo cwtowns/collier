@@ -5,11 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MiningAutomater.IO;
-using MiningAutomater.Mining;
-using MiningAutomater.Monitoring;
-using MiningAutomater.Monitoring.Gpu;
-using MiningAutomater.Monitoring.Idle;
+using Collier.IO;
+using Collier.Mining;
+using Collier.Monitoring;
+using Collier.Monitoring.Gpu;
+using Collier.Monitoring.Idle;
 using System.IO;
 using System.Net.Http;
 
@@ -46,11 +46,11 @@ namespace GrpcGreeter
             services.Configure<TrexMiner.Settings>(options => tRexMinerSection.Bind(options));
             services.Configure<TrexWebClient.Settings>(options => tRexMinerSection.GetSection("web").Bind(options));
 
-            services.Configure<MiningAutomater.Monitoring.EventCoordinatorBackgroundService.Settings>(options => monitoringSection.GetSection("eventCoordinator").Bind(options));
+            services.Configure<Collier.Monitoring.EventCoordinatorBackgroundService.Settings>(options => monitoringSection.GetSection("eventCoordinator").Bind(options));
 
             var gpuMonitoring = monitoringSection.GetSection("gpuMonitoring");
 
-            services.Configure<MiningAutomater.Monitoring.Gpu.GpuMonitoringBackgroundService.Settings>(options => gpuMonitoring.Bind(options));
+            services.Configure<Collier.Monitoring.Gpu.GpuMonitoringBackgroundService.Settings>(options => gpuMonitoring.Bind(options));
 
             services.Configure<GpuMonitorOutputParser_GpuLoad.Settings>(options => gpuMonitoring.GetSection("outputParsers").GetSection("gpuLoadOutputParser").Bind(options));
             services.Configure<GpuMonitorOutputParser_ProcessList.Settings>(options => gpuMonitoring.GetSection("outputParsers").GetSection("processListOutputParser").Bind(options));
@@ -68,8 +68,8 @@ namespace GrpcGreeter
             services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_GpuLoad>();
             services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_ProcessList>();
             services.AddSingleton<ITrexWebClient, TrexWebClient>();
-            services.AddSingleton<IEventCoordinatorBackgroundService, MiningAutomater.Monitoring.EventCoordinatorBackgroundService>();
-            services.AddSingleton<IGpuMonitoringBackgroundService, MiningAutomater.Monitoring.Gpu.GpuMonitoringBackgroundService>();
+            services.AddSingleton<IEventCoordinatorBackgroundService, Collier.Monitoring.EventCoordinatorBackgroundService>();
+            services.AddSingleton<IGpuMonitoringBackgroundService, Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>();
             services.AddSingleton<IIdleMonitorBackgroundService, IdleMonitorBackgroundService>();
             services.AddSingleton<IIdleMonitor, IdleMonitor>();
             services.AddSingleton<ProcessFactory, ProcessFactory>();
@@ -82,9 +82,9 @@ namespace GrpcGreeter
             //services.AddSingleton<IBackgroundService<IdleMonitorBackgroundService>, IdleMonitorBackgroundService>();
             //services.AddSingleton<IBackgroundService<EventCoordinatorBackgroundService>, EventCoordinatorBackgroundService>();
 
-            services.AddHostedService<MiningAutomater.Host.GpuMonitoringBackgroundService>();
-            services.AddHostedService<MiningAutomater.Host.IdleMonitoringBackgroundService>();
-            services.AddHostedService<MiningAutomater.Host.EventCoordinatorBackgroundService>();
+            services.AddHostedService<Collier.Host.GpuMonitoringBackgroundService>();
+            services.AddHostedService<Collier.Host.IdleMonitoringBackgroundService>();
+            services.AddHostedService<Collier.Host.EventCoordinatorBackgroundService>();
 
             //TODO why doesnt this approach work?  Make a sample project and post on stack overflow?
 

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Runtime.InteropServices;
 
-namespace MiningAutomater.Monitoring.Idle
+namespace Collier.Monitoring.Idle
 {
     public class IdleMonitor : IIdleMonitor
     {

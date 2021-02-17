@@ -4,7 +4,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Mining
+namespace Collier.Mining
 {
     public class TrexWebClient : ITrexWebClient
     {

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Host
+namespace Collier.Host
 {
     public class BackgroundServiceHelper<T> : BackgroundService
     {

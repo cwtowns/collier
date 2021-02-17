@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace MiningAutomater.IO
+namespace Collier.IO
 {
     public interface IProcess
     {

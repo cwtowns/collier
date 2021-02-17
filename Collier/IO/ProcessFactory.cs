@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace MiningAutomater.IO
+namespace Collier.IO
 {
     public class ProcessFactory
     {

@@ -13,7 +13,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/MiningAutomater/bin/Debug/net5.0/CollierService.dll",
+            "program": "${workspaceFolder}/Collier/bin/Debug/net5.0/CollierService.dll",
             "args": [],
             "cwd": "${workspaceFolder}/MiningAutomater",
             "stopAtEntry": false,

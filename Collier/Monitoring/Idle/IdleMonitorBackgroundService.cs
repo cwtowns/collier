@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.Host;
+using Collier.Host;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Monitoring.Idle
+namespace Collier.Monitoring.Idle
 {
     public class IdleMonitorBackgroundService : IIdleMonitorBackgroundService, IBackgroundService<IdleMonitorBackgroundService>
     {

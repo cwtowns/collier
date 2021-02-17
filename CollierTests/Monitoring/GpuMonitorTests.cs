@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using MiningAutomater.Monitoring.Gpu;
+using Collier.Monitoring.Gpu;
 using Moq;
 using System.Collections.Generic;
 using Xunit;
 
-namespace MiningAutomaterTests.Monitoring
+namespace CollierTests.Monitoring
 {
     public class GpuMonitorTests
     {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
-using MiningAutomater.Monitoring;
+using Collier.Monitoring;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Host
+namespace Collier.Host
 {
     public class EventCoordinatorBackgroundService : BackgroundService
     {

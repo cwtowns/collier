@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.Mining;
-using MiningAutomater.Monitoring;
-using MiningAutomater.Monitoring.Gpu;
-using MiningAutomater.Monitoring.Idle;
+using Collier.Mining;
+using Collier.Monitoring;
+using Collier.Monitoring.Gpu;
+using Collier.Monitoring.Idle;
 using Moq;
 using System;
 using Xunit;
 
-namespace MiningAutomaterTests.Monitoring
+namespace CollierTests.Monitoring
 {
     //TODO tests around pause and unpause are not present yet because the unset pause URL setting bug was not caught until runtime
 

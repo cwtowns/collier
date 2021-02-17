@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.Host;
+using Collier.Host;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public class GpuMonitoringBackgroundService : IGpuMonitoringBackgroundService, IBackgroundService<GpuMonitoringBackgroundService>
     {

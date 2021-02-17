@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.Monitoring.Idle;
+using Collier.Monitoring.Idle;
 using Moq;
 using System;
 using Xunit;
 
-namespace MiningAutomaterTests.Monitoring
+namespace CollierTests.Monitoring
 {
     public class IdleMonitorBackgroundServiceTests
     {

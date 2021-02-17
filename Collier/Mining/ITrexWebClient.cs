@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace MiningAutomater.Mining
+namespace Collier.Mining
 {
     public interface ITrexWebClient
     {

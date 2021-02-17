@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace MiningAutomater.IO
+namespace Collier.IO
 {
     public class PeekableStringReaderAdapter : IDisposable
     {

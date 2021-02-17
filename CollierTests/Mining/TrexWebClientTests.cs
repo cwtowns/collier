@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Options;
-using MiningAutomater.Mining;
+using Collier.Mining;
 using TestingUtilities;
 using Xunit;
 
-namespace MiningAutomaterTests.Mining
+namespace CollierTests.Mining
 {
     public class TrexWebClientTests
     {

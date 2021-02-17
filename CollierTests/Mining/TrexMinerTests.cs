@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.IO;
-using MiningAutomater.Mining;
+using Collier.IO;
+using Collier.Mining;
 using Moq;
 using System.Diagnostics;
 using Xunit;
 
-namespace MiningAutomaterTests.Mining
+namespace CollierTests.Mining
 {
     public class TrexMinerTests
     {

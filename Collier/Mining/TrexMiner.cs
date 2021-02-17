@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MiningAutomater.IO;
+using Collier.IO;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.Mining
+namespace Collier.Mining
 {
 
     //to pause you have to specify the exact GPU  like with this:   http://127.0.0.1:4067/control?pause=true:0

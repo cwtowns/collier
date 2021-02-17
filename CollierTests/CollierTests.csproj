@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MiningAutomater\CollierService.csproj" />
+    <ProjectReference Include="..\Collier\CollierService.csproj" />
     <ProjectReference Include="..\TestingUtilities\TestingUtilities.csproj" />
   </ItemGroup>
 

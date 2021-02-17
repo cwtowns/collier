@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace MiningAutomater.IO
+namespace Collier.IO
 {
     public class ProcessWrapper : IProcess
     {
