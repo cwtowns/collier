@@ -111,37 +111,6 @@ namespace MiningAutomater.Monitoring.Gpu
 
                             continue;
                         }
-
-                        //when we indent here we're changing the data where it doesnt look json like.  
-                        //in this example the previous line we parsed was a property, and now we have an indented property.
-                        //we will convert the previous line into an object property to help with parsing.
-                        /*
-                        var currentProperty = currentObject.Last as JProperty;
-
-                        if (currentProperty != null)
-                        {
-                            var newPropertyName = currentProperty.Name + "_" + currentProperty.Value;
-                            var newObject = new JObject();
-                            newObject[newPropertyName] = new JObject();
-
-                            if (currentObject.Parent == null)
-                                currentObject = newObject[newPropertyName];
-                            else
-                            {
-                                currentObject.Parent[currentProperty.Name].Remove();
-                                currentObject.Parent[newPropertyName] = newObject;
-                            }
-
-
-                        }
-                        else
-                        {
-                            var newPropertyName = propertyName + "_" + propertyValue;
-                            currentObject[newPropertyName] = new JObject();
-                            lastIndentCount = currentIndentCount;
-                            continue;
-                        }
-                        */
                     }
                     nextLine = reader.PeekLine();
                     nextIndentCount = nextLine == null ? 0 : GetIndentCount(nextLine);
