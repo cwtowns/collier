@@ -17,7 +17,7 @@ namespace MiningAutomaterTests.Mining
             var httpClient = HttpClientMock.GetClientWithSpecificResultPayload("{ 'hashrate' : 100 }");
             var webClient = new TrexWebClient(Options.Create(settings), httpClient);
 
-            (await webClient.IsMiningAsync()).Should().Be(true, "the hashrate is above zero");
+            (await webClient.IsRunningAsync()).Should().Be(true, "the hashrate is above zero");
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace MiningAutomaterTests.Mining
             var httpClient = HttpClientMock.GetClientWithSpecificResultPayload("{ 'hashrate' : 0 }");
             var webClient = new TrexWebClient(Options.Create(settings), httpClient);
 
-            (await webClient.IsMiningAsync()).Should().Be(false, "the hashrate is zero");
+            (await webClient.IsRunningAsync()).Should().Be(false, "the hashrate is zero");
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace MiningAutomaterTests.Mining
 
             var webClient = new TrexWebClient(Options.Create(settings), httpClient);
 
-            (await webClient.IsMiningAsync()).Should().Be(false, "the hashrate is missing");
+            (await webClient.IsRunningAsync()).Should().Be(false, "the hashrate is missing");
         }
 
     }

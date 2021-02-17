@@ -60,7 +60,7 @@ namespace MiningAutomater.Mining
             if (_minerProcess.HasExited == true)
                 return false;
 
-            return await _webClient.IsMiningAsync();
+            return await _webClient.IsRunningAsync();
         }
 
         public void Start()

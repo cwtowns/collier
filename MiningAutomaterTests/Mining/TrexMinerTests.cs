@@ -16,7 +16,7 @@ namespace MiningAutomaterTests.Mining
         {
             var methodCalled = false;
             var mockWebClient = new Mock<ITrexWebClient>();
-            mockWebClient.Setup(x => x.IsMiningAsync()).ReturnsAsync(() => methodCalled = true);
+            mockWebClient.Setup(x => x.IsRunningAsync()).ReturnsAsync(() => methodCalled = true);
 
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
@@ -34,7 +34,7 @@ namespace MiningAutomaterTests.Mining
         {
             var methodCalled = false;
             var mockWebClient = new Mock<ITrexWebClient>();
-            mockWebClient.Setup(x => x.IsMiningAsync()).ReturnsAsync(() => methodCalled = true);
+            mockWebClient.Setup(x => x.IsRunningAsync()).ReturnsAsync(() => methodCalled = true);
 
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();

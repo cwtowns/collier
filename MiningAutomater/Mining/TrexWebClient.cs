@@ -25,7 +25,7 @@ namespace MiningAutomater.Mining
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public async virtual Task<bool> IsMiningAsync()
+        public async virtual Task<bool> IsRunningAsync()
         {
             var result = await _httpClient.GetStringAsync(_settings.StatusUrl);
 
@@ -42,12 +42,6 @@ namespace MiningAutomater.Mining
         public async virtual void ResumeAsync()
         {
             await _httpClient.GetStringAsync(_settings.ResumeUrl);
-        }
-
-        public async virtual Task<bool> IsRunningAsync()
-        {
-            var result = await _httpClient.GetAsync(_settings.StatusUrl);
-            return result.IsSuccessStatusCode;
         }
     }
 }
