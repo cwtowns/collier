@@ -36,7 +36,7 @@ namespace GrpcGreeter
 
             services.AddGrpc();
 
-
+            //TODO long term look for a framework that automates this binding.  this is a lot of boilerplate code
 
             //services.Configure<GpuMonitoringSettings>(_configuration.GetSection("gpuMonitoring"));
 
@@ -62,7 +62,7 @@ namespace GrpcGreeter
             services.Configure<IdleMonitorBackgroundService.Settings>(options => monitoringSection.GetSection("userIdle").Bind(options));
 
 
-
+            //TODO refactor the DI wire up to follow dot net core best practices via extension methods
 
             services.AddSingleton<IMiner, TrexMiner>();
             services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_GpuLoad>();
