@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using MiningAutomater.Host;
+﻿using MiningAutomater.Host;
 using System;
 
 namespace MiningAutomater.Monitoring.Idle

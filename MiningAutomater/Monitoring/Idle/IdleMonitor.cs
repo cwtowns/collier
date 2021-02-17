@@ -52,13 +52,7 @@ namespace MiningAutomater.Monitoring.Idle
             }
         }
 
-        public virtual TimeSpan IdleTime
-        {
-            get
-            {
-                return DateTime.UtcNow.Subtract(LastInput);
-            }
-        }
+        public virtual TimeSpan IdleTime => DateTime.UtcNow.Subtract(LastInput);
 
         public virtual int LastInputTicks
         {

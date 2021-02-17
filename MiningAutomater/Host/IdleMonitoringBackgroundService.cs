@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Extensions.Hosting;
 using MiningAutomater.Monitoring.Idle;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MiningAutomater.Host
 {
     public class IdleMonitoringBackgroundService : BackgroundService
     {
-        private IIdleMonitorBackgroundService _realService;
+        private readonly IIdleMonitorBackgroundService _realService;
         public IdleMonitoringBackgroundService(IIdleMonitorBackgroundService realService)
         {
             _realService = realService ?? throw new ArgumentNullException(nameof(realService));

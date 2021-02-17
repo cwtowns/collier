@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MiningAutomater.Host;
 using MiningAutomater.IO;
 using MiningAutomater.Mining;
 using MiningAutomater.Monitoring;
@@ -14,7 +12,6 @@ using MiningAutomater.Monitoring.Gpu;
 using MiningAutomater.Monitoring.Idle;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
 
 namespace GrpcGreeter
 {

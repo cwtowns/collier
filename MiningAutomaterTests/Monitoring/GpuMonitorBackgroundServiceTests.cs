@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using MiningAutomater.Monitoring.Gpu;
 using Moq;
 using System;
-using System.Threading;
 using Xunit;
 
 namespace MiningAutomaterTests.Monitoring

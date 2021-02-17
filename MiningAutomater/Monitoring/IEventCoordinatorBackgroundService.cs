@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
-using MiningAutomater.Host;
+﻿using MiningAutomater.Host;
 using MiningAutomater.Monitoring.Gpu;
 using MiningAutomater.Monitoring.Idle;
-using System;
 
 namespace MiningAutomater.Monitoring
 {
