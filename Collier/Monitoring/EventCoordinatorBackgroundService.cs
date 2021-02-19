@@ -97,16 +97,17 @@ namespace Collier.Monitoring
             return true;
         }
 
-        public virtual async void CheckForSystemIdle()
+        public virtual void CheckForSystemIdle()
         {
             if (IsSystemIdle())
             {
                 _logger.LogDebug("Overall system is idle");
-                if (!await _miner.IsRunningAsync())
-                {
-                    _logger.LogInformation("Starting miner");
-                    _miner.Start();
-                }
+                //TOOD this might mean the tests have to change and i havent adjusted for this, see if tests fail and if they dont then what test am i missing?  If they do, fix the test
+                //if (!await _miner.IsRunningAsync())
+                //{
+                _logger.LogInformation("Starting miner");
+                _miner.Start();
+                //}
             }
         }
         public virtual async Task ExecuteAsync(CancellationToken stoppingToken)

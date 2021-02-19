@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Collier.Monitoring.Idle;
 using Moq;
 using System;
+using System.Threading;
 using Xunit;
 
 namespace CollierTests.Monitoring
@@ -11,12 +12,12 @@ namespace CollierTests.Monitoring
     public class IdleMonitorBackgroundServiceTests
     {
         [Fact]
-        public void NotificationSentWhenIdleDetected()
+        public async void NotificationSentWhenIdleDetected()
         {
             var monitor = new Mock<IIdleMonitor>();
             monitor.Setup(x => x.IsUserIdlingPastThreshold()).Returns(true);
 
-            var settings = new IdleMonitorBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
+            var settings = new IdleMonitorBackgroundService.Settings() { PollingIntervalInSeconds = 0 };
 
             var backgroundService = new IdleMonitorBackgroundService(
                 new Mock<ILogger<IdleMonitorBackgroundService>>().Object,
@@ -28,18 +29,22 @@ namespace CollierTests.Monitoring
             var eventHandlerDelegate = new System.EventHandler<IdleEvent>(action);
             backgroundService.IdleThresholdReached += eventHandlerDelegate;
 
-            backgroundService.CheckIdleState();
+            var tokenSource = new CancellationTokenSource();
+
+            tokenSource.Cancel();
+            await backgroundService.ExecuteAsync(tokenSource.Token);
+
 
             capturedEvent.IsIdle.Should().BeTrue("because when the user has moved to the idle state we should send the event.");
         }
 
         [Fact]
-        public void NoNotificationSentWhenIdleDetected()
+        public async void NoNotificationSentWhenIdleDetected()
         {
             var monitor = new Mock<IIdleMonitor>();
             monitor.Setup(x => x.IsUserIdlingPastThreshold()).Returns(false);
 
-            var settings = new IdleMonitorBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
+            var settings = new IdleMonitorBackgroundService.Settings() { PollingIntervalInSeconds = 0 };
 
             var backgroundService = new IdleMonitorBackgroundService(
                 new Mock<ILogger<IdleMonitorBackgroundService>>().Object,
@@ -51,7 +56,11 @@ namespace CollierTests.Monitoring
             var eventHandlerDelegate = new System.EventHandler<IdleEvent>(action);
             backgroundService.IdleThresholdReached += eventHandlerDelegate;
 
-            backgroundService.CheckIdleState();
+            var tokenSource = new CancellationTokenSource();
+            tokenSource.Cancel();
+
+            await backgroundService.ExecuteAsync(tokenSource.Token);
+
 
             capturedEvent.IsIdle.Should().BeFalse("because when is not idle no notification should be sent.");
         }

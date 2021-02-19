@@ -445,3 +445,5 @@ $RECYCLE.BIN/
 ## Collier specific settings
 ##
 minersettings.private.json
+/CollierTests/dotCover.dcvr
+/CollierTests/dotCover.dcvr.settings

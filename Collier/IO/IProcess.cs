@@ -15,6 +15,8 @@ namespace Collier.IO
         delegate void DataReceivedEventHandler(object sender, DataReceivedEventArgs e);
 
         Task WaitForExitAsync();
+
+        public int Id { get; }
     }
 
     public class DataReceivedEventArgs

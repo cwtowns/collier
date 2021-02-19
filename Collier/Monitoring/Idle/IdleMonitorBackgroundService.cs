@@ -35,7 +35,7 @@ namespace Collier.Monitoring.Idle
             stoppingToken.Register(() =>
                 _logger.LogInformation("IdleMonitorBackgroundService background task is stopping."));
 
-            while (!stoppingToken.IsCancellationRequested)
+            do
             {
                 try
                 {
@@ -48,8 +48,11 @@ namespace Collier.Monitoring.Idle
                     _logger.LogError(e, "uncaught exception in executeAsync loop");
                 }
 
+                if (stoppingToken.IsCancellationRequested)
+                    break;
                 await Task.Delay(_settings.PollingIntervalInSeconds * 1000, stoppingToken);
-            }
+
+            } while (!stoppingToken.IsCancellationRequested);
 
             _logger.LogInformation("IdleMonitorBackgroundService is stopping.");
         }

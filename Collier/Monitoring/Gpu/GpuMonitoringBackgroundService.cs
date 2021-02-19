@@ -4,6 +4,7 @@ using Collier.Host;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Collier.Mining;
 
 namespace Collier.Monitoring.Gpu
 {
@@ -19,15 +20,18 @@ namespace Collier.Monitoring.Gpu
         private readonly ILogger<GpuMonitoringBackgroundService> _logger;
         private readonly IGpuMonitor _gpuMonitor;
         private readonly Settings _settings;
+        private readonly IMiner _miner;
 
-        public GpuMonitoringBackgroundService(ILogger<GpuMonitoringBackgroundService> logger, IGpuMonitor gpuMonitor, IOptions<Settings> settings)
+        public GpuMonitoringBackgroundService(ILogger<GpuMonitoringBackgroundService> logger, IGpuMonitor gpuMonitor, IOptions<Settings> settings, IMiner miner)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _gpuMonitor = gpuMonitor ?? throw new ArgumentNullException(nameof(gpuMonitor));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings.Value));
+            _miner = miner ?? throw new ArgumentNullException(nameof(miner));
 
             _logger.LogDebug("settings:  {pollInternal} ", _settings.PollingIntervalInSeconds);
             logger.LogDebug("GpuMonitoringBackgroundService Created");
+
         }
         public virtual async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -35,6 +39,8 @@ namespace Collier.Monitoring.Gpu
 
             stoppingToken.Register(() =>
                 _logger.LogInformation("GpuMonitoringBackgroundService is stopping."));
+
+            _miner.Start();
 
             while (!stoppingToken.IsCancellationRequested)
             {

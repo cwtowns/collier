@@ -23,14 +23,12 @@ namespace Collier.Mining
             public string ExeArguments { get; set; }
         }
 
-        private readonly string _fullyQualfiedMiner;
-        private IProcess _minerProcess;
         private readonly ILogger<TrexMiner> _logger;
         private readonly Settings _settings;
         private readonly ITrexWebClient _webClient;
-        private readonly ProcessFactory _processFactory;
+        private readonly IMinerProcessFactory _processFactory;
 
-        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, ProcessFactory processFactory)
+        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -40,68 +38,70 @@ namespace Collier.Mining
             _settings.ExeFileName = _settings.ExeFileName ?? string.Empty;
             _settings.ExeLocation = _settings.ExeLocation ?? string.Empty;
             _settings.ExeArguments = _settings.ExeArguments ?? string.Empty;
-
-            _fullyQualfiedMiner = System.IO.Path.Combine(_settings.ExeLocation, _settings.ExeFileName);
         }
 
         public void Dispose()
         {
-            if (_minerProcess == null || _minerProcess.HasExited)
+            var process = _processFactory.CurrentProcess;
+
+            if (process == null || process.HasExited)
                 return;
 
-            _minerProcess.Kill(true);
+            process.Kill(true);
         }
 
         public async Task<bool> IsRunningAsync()
         {
-            if (_minerProcess == null)
-                return false;
+            var process = _processFactory.CurrentProcess;
 
-            if (_minerProcess.HasExited == true)
-                return false;
+            if (process == null)
+                return await _webClient.IsMiningAsync();
 
-            return await _webClient.IsRunningAsync();
+            if (!process.HasExited)
+                return true;
+
+            return await _webClient.IsMiningAsync();
         }
 
-        public void Start()
+        public async void Start()
         {
-            if (_minerProcess != null && !_minerProcess.HasExited)
+            var process = _processFactory.CurrentProcess;
+
+            if (process == null || process.HasExited)
             {
-                _webClient.ResumeAsync();
+                process = await _processFactory.GetNewOrExistingProcessAsync();
+                process.OutputDataReceived += (sender, a) => _logger.LogInformation(a.Data);
+                process.Start();
+                process.BeginOutputReadLine();
+
                 return;
             }
 
-            if (_minerProcess != null)
-                return;
-            _minerProcess = _processFactory.GetProcess(new ProcessStartInfo
+            if (!process.HasExited)
             {
-                FileName = _fullyQualfiedMiner,
-                Arguments = _settings.ExeArguments,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            });
-
-            _minerProcess.OutputDataReceived += (sender, a) => _logger.LogInformation(a.Data);
-
-            _minerProcess.Start();
-            _minerProcess.BeginOutputReadLine();
+                await _webClient.ResumeAsync();
+            }
         }
 
         public void Stop()
         {
-            if (_minerProcess == null || _minerProcess.HasExited)
+            var process = _processFactory.CurrentProcess;
+
+            if (process == null || process.HasExited)
                 return;
 
             _webClient.PauseAsync();
         }
 
+        /*
         public void Kill()
         {
-            if (_minerProcess == null || _minerProcess.HasExited)
+            var process = _processFactory.CurrentProcess;
+            if (process == null || process.HasExited)
                 return;
 
-            _minerProcess.Kill(true);
+            process.Kill(true);
         }
+        */
     }
 }

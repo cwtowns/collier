@@ -12,6 +12,8 @@ using Collier.Monitoring.Gpu;
 using Collier.Monitoring.Idle;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
+using Collier.Host;
 
 namespace GrpcGreeter
 {
@@ -19,6 +21,8 @@ namespace GrpcGreeter
     {
         private IServiceCollection _services;
         private IConfiguration _configuration;
+
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -82,6 +86,9 @@ namespace GrpcGreeter
             //services.AddSingleton<IBackgroundService<IdleMonitorBackgroundService>, IdleMonitorBackgroundService>();
             //services.AddSingleton<IBackgroundService<EventCoordinatorBackgroundService>, EventCoordinatorBackgroundService>();
 
+            services.AddSingleton<IMinerProcessFactory, MinerProcessFactory>();
+            services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(_cancellationTokenSource.Token));
+
             services.AddHostedService<Collier.Host.GpuMonitoringBackgroundService>();
             services.AddHostedService<Collier.Host.IdleMonitoringBackgroundService>();
             services.AddHostedService<Collier.Host.EventCoordinatorBackgroundService>();
@@ -119,9 +126,18 @@ namespace GrpcGreeter
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        private void OnShutdown()
         {
+            _cancellationTokenSource.Cancel();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Microsoft.Extensions.Hosting.IHostApplicationLifetime lifetime)
+        {
+            var cancellationSource = new CancellationTokenSource();
+
+            lifetime.ApplicationStopping.Register(OnShutdown);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

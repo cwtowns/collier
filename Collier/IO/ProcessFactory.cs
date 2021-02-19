@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Collier.IO
 {
@@ -10,6 +11,18 @@ namespace Collier.IO
             {
                 StartInfo = startInfo
             });
+        }
+
+        public virtual IList<IProcess> GetExistingProcessList(string processName)
+        {
+            var results = new List<IProcess>();
+            Process[] processCollection = Process.GetProcessesByName(processName);
+            foreach (Process p in processCollection)
+            {
+                results.Add( new ProcessWrapper(p));
+            }
+
+            return results;
         }
     }
 }

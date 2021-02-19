@@ -23,9 +23,12 @@ namespace Collier.IO
             OutputDataReceived?.Invoke(sender, new DataReceivedEventArgs(e.Data));
         }
 
+        public int Id => _process.Id;
+
         public void BeginOutputReadLine()
         {
             _process.BeginOutputReadLine();
+
         }
 
         public void Kill(bool entireProcessTree)

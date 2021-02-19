@@ -10,8 +10,6 @@ using Xunit;
 
 namespace CollierTests.Monitoring
 {
-    //TODO tests around pause and unpause are not present yet because the unset pause URL setting bug was not caught until runtime
-
     public class EventCoordinatorBackgroundServiceTests
     {
         [Fact]
@@ -123,7 +121,7 @@ namespace CollierTests.Monitoring
 
 
         [Fact]
-        public void IdleSystemDoesNotStartMinerWhenMinerRunning()
+        public void IdleSystemAttemptsToStartMiner()
         {
             var logger = new Mock<ILogger<EventCoordinatorBackgroundService>>().Object;
             var settings = new EventCoordinatorBackgroundService.Settings();
@@ -139,7 +137,7 @@ namespace CollierTests.Monitoring
 
             service.CheckForSystemIdle();
 
-            mockMiner.Verify(x => x.Start(), Times.Never, "mining is already running so it should not attempt to start again");
+            mockMiner.Verify(x => x.Start(), Times.Once, "idle events should start the miner");
         }
 
         [Fact]
