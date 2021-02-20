@@ -5,8 +5,6 @@ namespace GrpcGreeter
 {
     public class Program
     {
-        //TODO look for existing process in the process list to prevent multiple miners from running.  It is possible to reattach to a process's stdout?
-
         //TODO can I keep color output?  I dislike my log right now and color output would be very nice.
 
         //TODO can it automatically pause when a process is detected?  that could be cool.  It doesn't look like this takes a lot of resources at all.

@@ -33,13 +33,12 @@ namespace Collier.Monitoring.Gpu
                 if (!firstProperty.Name.StartsWith("GPU 00000000"))
                     continue;
 
-                var gpuValue = firstProperty.Value["Utilization"].Value<string>("Gpu");
+                var gpuValue = firstProperty.Value["Utilization"]?.Value<string>("Gpu");
 
-                gpuValue = gpuValue.Trim('%').Trim(' ');
+                gpuValue = gpuValue?.Trim('%').Trim(' ');
 
-                int currentLoad = 0;
-                if (!int.TryParse(gpuValue, out currentLoad))
-                    throw new ArgumentOutOfRangeException(nameof(gpuValue), "Gpu value is not a parsable number (" + gpuValue + ")");
+                if (!int.TryParse(gpuValue, out int currentLoad))
+                    throw new ArgumentOutOfRangeException(nameof(gpuValue), "Gpu value could not be parsed as a number (" + gpuValue + ")");
 
                 return currentLoad > _settings.LoadThresholdForActivity;
             }

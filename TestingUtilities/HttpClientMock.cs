@@ -28,5 +28,24 @@ namespace TestingUtilities
 
             return new HttpClient(handlerMock.Object);
         }
+
+        public static HttpClient GetResponseWithStatusCode(HttpStatusCode code)
+        {
+            var handlerMock = new Mock<HttpMessageHandler>();
+            var response = new HttpResponseMessage
+            {
+                StatusCode = code
+            };
+
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(response);
+
+            return new HttpClient(handlerMock.Object);
+        }
     }
 }

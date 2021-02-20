@@ -12,21 +12,21 @@ namespace CollierTests.Mining
     public class TrexMinerTests
     {
         [Fact]
-        public async void WebMinerIsNotInvokedWhenProcessIsDead()
+        public async void WebMinerIsCheckedWhenProcessIsDead()
         {
             var methodCalled = false;
             var mockWebClient = new Mock<ITrexWebClient>();
-            mockWebClient.Setup(x => x.IsRunningAsync()).ReturnsAsync(() => methodCalled = true);
+            mockWebClient.Setup(x => x.IsMiningAsync()).ReturnsAsync(() => methodCalled = true);
 
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
-            var factory = new Mock<ProcessFactory>();
+            var factory = new Mock<IMinerProcessFactory>();
 
             var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object);
 
             await miner.IsRunningAsync();
 
-            methodCalled.Should().Be(false, "we should not invoke the web client when the process does not exist.");
+            methodCalled.Should().Be(true, "we should not invoke the web client when the process does not exist.");
         }
 
         [Fact]
@@ -34,14 +34,14 @@ namespace CollierTests.Mining
         {
             var methodCalled = false;
             var mockWebClient = new Mock<ITrexWebClient>();
-            mockWebClient.Setup(x => x.IsRunningAsync()).ReturnsAsync(() => methodCalled = true);
+            mockWebClient.Setup(x => x.IsMiningAsync()).ReturnsAsync(() => methodCalled = true);
 
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
-            var factory = new Mock<ProcessFactory>();
+            var factory = new Mock<IMinerProcessFactory>();
             var process = new Mock<IProcess>();
 
-            factory.Setup(x => x.GetProcess(It.IsAny<ProcessStartInfo>())).Returns(process.Object);
+            factory.Setup(x => x.GetNewOrExistingProcessAsync()).ReturnsAsync(process.Object);
 
             var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object);
 
@@ -59,12 +59,23 @@ namespace CollierTests.Mining
 
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
-            var factory = new Mock<ProcessFactory>();
+            var factory = new Mock<IMinerProcessFactory>();
             var process = new Mock<IProcess>();
-
-            factory.Setup(x => x.GetProcess(It.IsAny<ProcessStartInfo>())).Returns(process.Object);
-
             process.Setup(x => x.HasExited).Returns(false);
+            var spawned = false;
+
+            factory.Setup(x => x.GetNewOrExistingProcessAsync()).ReturnsAsync(() =>
+            {
+                spawned = true;
+                return process.Object;
+            });
+
+            factory.Setup(x => x.CurrentProcess).Returns(() =>
+            {
+                if (spawned)
+                    return process.Object;
+                return null;
+            });
 
             var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object);
 
@@ -83,11 +94,24 @@ namespace CollierTests.Mining
             mockWebClient.Setup(x => x.ResumeAsync()).Callback(() => methodCallCount++);
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
-            var factory = new Mock<ProcessFactory>();
+            var factory = new Mock<IMinerProcessFactory>();
             var process = new Mock<IProcess>();
+            process.Setup(x => x.HasExited).Returns(false);
 
-            factory.Setup(x => x.GetProcess(It.IsAny<ProcessStartInfo>())).Returns(process.Object);
+            var spawned = false;
 
+            factory.Setup(x => x.GetNewOrExistingProcessAsync()).ReturnsAsync(() =>
+            {
+                spawned = true;
+                return process.Object;
+            });
+
+            factory.Setup(x => x.CurrentProcess).Returns(() =>
+            {
+                if (spawned)
+                    return process.Object;
+                return null;
+            });
             process.Setup(x => x.HasExited).Returns(false);
 
             var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object);
