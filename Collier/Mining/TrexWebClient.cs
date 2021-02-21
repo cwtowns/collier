@@ -117,9 +117,12 @@ namespace Collier.Mining
                         _logger.LogInformation("Connection refused.  Miner should not be running.");
                         return false;
                     }
+                    throw new ArgumentOutOfRangeException(
+                        "this is a response exception but its error code does not match:  " + se.ErrorCode, re);
                 }
                 _logger.LogError(re, "IsMiningAsync:  ");
-                throw;
+                throw new ArgumentOutOfRangeException(
+                    "this is a response exception but its inner exception is not the right type", re);
             }
             catch (Exception e)
             {
