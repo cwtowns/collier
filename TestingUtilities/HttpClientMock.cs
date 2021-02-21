@@ -58,7 +58,10 @@ namespace TestingUtilities
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .Throws(re);
+                .Callback(() =>
+                {
+                    throw re;
+                });
 
             return new HttpClient(handlerMock.Object);
         }
