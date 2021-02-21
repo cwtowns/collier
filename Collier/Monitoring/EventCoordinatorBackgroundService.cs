@@ -5,8 +5,10 @@ using Collier.Mining;
 using Collier.Monitoring.Gpu;
 using Collier.Monitoring.Idle;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CollierService.Monitoring.Gpu;
 
 namespace Collier.Monitoring
 {
@@ -22,23 +24,26 @@ namespace Collier.Monitoring
         private readonly ILogger<EventCoordinatorBackgroundService> _logger;
         private readonly IIdleMonitorBackgroundService _idleMonitorService;
         private readonly IGpuMonitoringBackgroundService _gpuMonitorService;
+        private readonly IGpuMonitoringBackgroundService2 _backgroundService2;
         private readonly IMiner _miner;
         private readonly Settings _settings;
 
         private IdleEvent _userIdleEvent;
         private GpuIdleEvent _gpuIdleEvent;
+        private GpuProcessEvent _GpuProcessEvent;
 
-
-        public EventCoordinatorBackgroundService(ILogger<EventCoordinatorBackgroundService> logger, IOptions<Settings> settings, IIdleMonitorBackgroundService idleMonitorService, IGpuMonitoringBackgroundService gpuMonitorService, IMiner miner)
+        public EventCoordinatorBackgroundService(ILogger<EventCoordinatorBackgroundService> logger, IOptions<Settings> settings, IIdleMonitorBackgroundService idleMonitorService, IGpuMonitoringBackgroundService gpuMonitorService, IMiner miner, IGpuMonitoringBackgroundService2 backgroundService2)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _idleMonitorService = idleMonitorService ?? throw new ArgumentNullException(nameof(idleMonitorService));
             _gpuMonitorService = gpuMonitorService ?? throw new ArgumentNullException(nameof(gpuMonitorService));
             _miner = miner ?? throw new ArgumentNullException(nameof(miner));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings.Value));
+            _backgroundService2 = backgroundService2;
 
             _idleMonitorService.IdleThresholdReached += IdleEventReceived;
             _gpuMonitorService.IdleThresholdReached += GpuEventReceived;
+            _backgroundService2.ProcessEventTriggered += GpuProcessEventReceived;
             logger.LogDebug("EventCoordinatorBackgroundService Created");
         }
 
@@ -122,7 +127,22 @@ namespace Collier.Monitoring
             {
                 try
                 {
-                    CheckForSystemIdle();
+                    if (_GpuProcessEvent != null)
+                    {
+                        if (_GpuProcessEvent.ActiveProcesses.Count == 0)
+                        {
+                            _logger.LogInformation("Ensuring miner is running as no monitored processes are running.");
+                            _miner.Start();
+                        }
+                        else
+                        {
+
+                            _logger.LogInformation("Stopping miner because processes were noticed:  {processList}", string.Join(',', _GpuProcessEvent.ActiveProcesses));
+                            _miner.Stop();
+                        }
+
+                        _GpuProcessEvent = null;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -133,6 +153,11 @@ namespace Collier.Monitoring
             }
 
             _logger.LogInformation("EventCoordinatorBackgroundService is stopping.");
+        }
+
+        public void GpuProcessEventReceived(object o, GpuProcessEvent e)
+        {
+            _GpuProcessEvent = e;
         }
     }
 }

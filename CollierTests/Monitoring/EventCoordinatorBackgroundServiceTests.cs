@@ -19,9 +19,10 @@ namespace CollierTests.Monitoring
             var settings = new EventCoordinatorBackgroundService.Settings();
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockMiner = new Mock<IMiner>();
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.CheckForSystemIdle();
 
@@ -35,10 +36,11 @@ namespace CollierTests.Monitoring
             var settings = new EventCoordinatorBackgroundService.Settings();
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockMiner = new Mock<IMiner>();
             mockMiner.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now, true));
             service.IdleEventReceived(mockGpuService.Object, new IdleEvent(DateTime.Now, true));
@@ -57,10 +59,11 @@ namespace CollierTests.Monitoring
 
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockMiner = new Mock<IMiner>();
             mockMiner.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now, true));
             service.IdleEventReceived(mockGpuService.Object, new IdleEvent(DateTime.Now, true));
@@ -79,10 +82,11 @@ namespace CollierTests.Monitoring
 
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockMiner = new Mock<IMiner>();
             mockMiner.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now, true));
             service.IdleEventReceived(mockGpuService.Object, new IdleEvent(DateTime.Now, true));
@@ -101,11 +105,12 @@ namespace CollierTests.Monitoring
             settings.PersistedGpuIdleTimeInSeconds = 1;
 
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
             var mockMiner = new Mock<IMiner>();
             mockMiner.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now.AddDays(-3), true));
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now.AddDays(-2), true));
@@ -127,10 +132,11 @@ namespace CollierTests.Monitoring
             var settings = new EventCoordinatorBackgroundService.Settings();
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockMiner = new Mock<IMiner>();
             mockMiner.Setup(x => x.IsRunningAsync()).ReturnsAsync(true);
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now, true));
             service.IdleEventReceived(mockGpuService.Object, new IdleEvent(DateTime.Now, true));
@@ -146,11 +152,12 @@ namespace CollierTests.Monitoring
             var logger = new Mock<ILogger<EventCoordinatorBackgroundService>>().Object;
             var settings = new EventCoordinatorBackgroundService.Settings();
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
             var mockMiner = new Mock<IMiner>();
             mockMiner.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now, true));
             service.IdleEventReceived(mockGpuService.Object, new IdleEvent(DateTime.Now, false));
@@ -167,10 +174,11 @@ namespace CollierTests.Monitoring
             var settings = new EventCoordinatorBackgroundService.Settings();
             var mockGpuService = new Mock<IGpuMonitoringBackgroundService>();
             var mockIdleService = new Mock<IIdleMonitorBackgroundService>();
+            var mockProcesservice = new Mock<IGpuMonitoringBackgroundService2>();
             var mockMiner = new Mock<IMiner>();
             mockMiner.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
 
-            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object);
+            var service = new EventCoordinatorBackgroundService(logger, Options.Create(settings), mockIdleService.Object, mockGpuService.Object, mockMiner.Object, mockProcesservice.Object);
 
             service.GpuEventReceived(mockGpuService.Object, new GpuIdleEvent(DateTime.Now, false));
             service.IdleEventReceived(mockGpuService.Object, new IdleEvent(DateTime.Now, true));

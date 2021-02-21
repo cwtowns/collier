@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using Collier.Host;
+using CollierService.Monitoring.Gpu;
 using Serilog;
 
 namespace GrpcGreeter
@@ -74,16 +75,19 @@ namespace GrpcGreeter
             //TODO refactor the DI wire up to follow dot net core best practices via extension methods
 
             _services.AddSingleton<IMiner, TrexMiner>();
-            _services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_GpuLoad>();
+            //_services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_GpuLoad>();
             _services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_ProcessList>();
             _services.AddSingleton<ITrexWebClient, TrexWebClient>();
             _services.AddSingleton<IEventCoordinatorBackgroundService, Collier.Monitoring.EventCoordinatorBackgroundService>();
             _services.AddSingleton<IGpuMonitoringBackgroundService, Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>();
+            _services.AddSingleton<IGpuProcessMonitor<GpuProcessEvent>, GpuMonitorOutputParser_ProcessList>();
             _services.AddSingleton<IIdleMonitorBackgroundService, IdleMonitorBackgroundService>();
             _services.AddSingleton<IIdleMonitor, IdleMonitor>();
             _services.AddSingleton<ProcessFactory, ProcessFactory>();
             _services.AddSingleton<INvidiaSmiParser, NvidiaSmiParser>();
             _services.AddSingleton<INvidiaSmiExecutor, NvidiaSmiExecutor>();
+
+            _services.AddSingleton<IGpuMonitoringBackgroundService2, GpuMonitoringBackgroundService2>();
             _services.AddSingleton<IGpuMonitor, GpuMonitor>();
             _services.AddSingleton(new HttpClient());
 
@@ -121,7 +125,6 @@ namespace GrpcGreeter
              */
 
             Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(_configuration).CreateLogger();
-
         }
 
         private void OnShutdown()

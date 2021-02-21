@@ -4,4 +4,9 @@
     {
         bool IsGpuUnderLoad(string output);
     }
+
+    public interface IGpuMonitor<T>
+    {
+
+    }
 }

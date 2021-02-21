@@ -8,8 +8,8 @@ namespace Collier.Host
 {
     public class GpuMonitoringBackgroundService : BackgroundService
     {
-        private readonly IGpuMonitoringBackgroundService _realService;
-        public GpuMonitoringBackgroundService(IGpuMonitoringBackgroundService realService)
+        private readonly IGpuMonitoringBackgroundService2 _realService;
+        public GpuMonitoringBackgroundService(IGpuMonitoringBackgroundService2 realService)
         {
             _realService = realService ?? throw new ArgumentNullException(nameof(realService));
         }

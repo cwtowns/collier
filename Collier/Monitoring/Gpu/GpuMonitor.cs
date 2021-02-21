@@ -30,7 +30,7 @@ namespace Collier.Monitoring.Gpu
             var commandOutput = await _smiExecutor.ExecuteCommandAsync();
 
             if (_smiExecutor.HasErrored)
-                throw new ArgumentOutOfRangeException("not sure what this should be");
+                throw new ArgumentOutOfRangeException("unable to exeute smi program.  commandOutput:  " + commandOutput);
 
             foreach (var parser in _outputParsers)
             {
