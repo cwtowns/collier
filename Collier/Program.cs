@@ -1,5 +1,10 @@
+using System;
+using System.Reflection;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace GrpcGreeter
 {
@@ -36,6 +41,10 @@ namespace GrpcGreeter
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.ConfigureLogging(log =>
+                    {
+                        log.AddSerilog(Log.Logger);
+                    });
                 });
         }
     }
