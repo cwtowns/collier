@@ -118,7 +118,7 @@ namespace Collier.Mining
                         return false;
                     }
                     throw new ArgumentOutOfRangeException(
-                        "this is a response exception but its error code does not match:  " + se.ErrorCode, re);
+                        string.Format("this is a response exception but its error code {0} does not match.  SocketerrorCode is {1}.", se.ErrorCode, se.SocketErrorCode), re);
                 }
                 _logger.LogError(re, "IsMiningAsync:  ");
                 throw new ArgumentOutOfRangeException(
