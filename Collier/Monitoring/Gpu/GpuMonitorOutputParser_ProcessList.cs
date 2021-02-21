@@ -12,7 +12,7 @@ namespace Collier.Monitoring.Gpu
     {
         public class Settings
         {
-            public ICollection<string> ValidGamePaths { get; set; }
+            public ICollection<string> ValidGamePaths { get; set; } = new List<string>();
         }
 
         private readonly INvidiaSmiParser _parser;
@@ -33,6 +33,20 @@ namespace Collier.Monitoring.Gpu
             IsGpuUnderLoad(output);
         }
         public bool IsGpuUnderLoad(string output)
+        {
+            if (output == null)
+                throw new ArgumentNullException(nameof(output));
+
+            var eventList = GetMonitoredProcesses(output);
+
+            //todo should this be async
+            var e = new GpuProcessEvent(eventList);
+            GpuActivityNoticed?.Invoke(this, e);
+
+            return eventList.Count > 0;
+        }
+
+        public virtual IList<string> GetMonitoredProcesses(string output)
         {
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
@@ -67,7 +81,7 @@ namespace Collier.Monitoring.Gpu
 
                         string app = val.Value<string>("Name");
 
-                        if (app.StartsWith(s))
+                        if (app.Trim().StartsWith(s.Trim(), StringComparison.OrdinalIgnoreCase))
                         {
                             _logger.LogDebug("found matching process {processPath}.", app);
                             eventList.Add(app);
@@ -76,11 +90,7 @@ namespace Collier.Monitoring.Gpu
                 }
             }
 
-            //todo should this be async
-            var e = new GpuProcessEvent(eventList);
-            GpuActivityNoticed?.Invoke(this, e);
-
-            return eventList.Count > 0;
+            return eventList;
         }
     }
 }

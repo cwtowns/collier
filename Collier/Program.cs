@@ -28,6 +28,14 @@ namespace GrpcGreeter
         //
         */
 
+        //TODO add a feature that lets us specify what miner output we show at informational level so we can turn off some of the log spam 
+        //this is probably going to be the rows that show hash rate and that's it?
+        //ultimately my client is going to want to also stream log info from the entire application / get status remotely
+
+        //TOOD how does running as a service work?
+        //once I set this up I can run the dev platform with a fake process that acts like the miner so I can iterate on this
+        //while still mining via my installed service
+
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();

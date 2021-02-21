@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using Moq.Protected;
 using System.Net;
 using System.Net.Http;
@@ -44,6 +45,20 @@ namespace TestingUtilities
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(response);
+
+            return new HttpClient(handlerMock.Object);
+        }
+
+        public static HttpClient GetResponseThatThrowsException<T>(T re) where T : Exception
+        {
+            var handlerMock = new Mock<HttpMessageHandler>();
+            handlerMock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Throws(re);
 
             return new HttpClient(handlerMock.Object);
         }

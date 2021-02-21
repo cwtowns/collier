@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace Collier.Host
 {
+    //TODO This pattern does not work, can it?
     public class BackgroundServiceHelper<T> : BackgroundService
     {
         private readonly IBackgroundService<T> _service;

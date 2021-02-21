@@ -19,6 +19,7 @@ using System.Threading;
 using Collier.Host;
 using CollierService.Monitoring.Gpu;
 using Serilog;
+using GpuMonitoringBackgroundService = Collier.Monitoring.Gpu.GpuMonitoringBackgroundService;
 
 namespace GrpcGreeter
 {
@@ -56,13 +57,11 @@ namespace GrpcGreeter
             _services.Configure<TrexMiner.Settings>(options => tRexMinerSection.Bind(options));
             _services.Configure<TrexWebClient.Settings>(options => tRexMinerSection.GetSection("web").Bind(options));
 
-            _services.Configure<Collier.Monitoring.EventCoordinatorBackgroundService.Settings>(options => monitoringSection.GetSection("eventCoordinator").Bind(options));
 
             var gpuMonitoring = monitoringSection.GetSection("gpuMonitoring");
 
             _services.Configure<Collier.Monitoring.Gpu.GpuMonitoringBackgroundService.Settings>(options => gpuMonitoring.Bind(options));
 
-            _services.Configure<GpuMonitorOutputParser_GpuLoad.Settings>(options => gpuMonitoring.GetSection("outputParsers").GetSection("gpuLoadOutputParser").Bind(options));
             _services.Configure<GpuMonitorOutputParser_ProcessList.Settings>(options => gpuMonitoring.GetSection("outputParsers").GetSection("processListOutputParser").Bind(options));
 
             _services.Configure<NvidiaSmiExecutor.Settings>(options => gpuMonitoring.Bind(options));
@@ -75,10 +74,8 @@ namespace GrpcGreeter
             //TODO refactor the DI wire up to follow dot net core best practices via extension methods
 
             _services.AddSingleton<IMiner, TrexMiner>();
-            //_services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_GpuLoad>();
             _services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_ProcessList>();
             _services.AddSingleton<ITrexWebClient, TrexWebClient>();
-            _services.AddSingleton<IEventCoordinatorBackgroundService, Collier.Monitoring.EventCoordinatorBackgroundService>();
             _services.AddSingleton<IGpuMonitoringBackgroundService, Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>();
             _services.AddSingleton<IGpuProcessMonitor<GpuProcessEvent>, GpuMonitorOutputParser_ProcessList>();
             _services.AddSingleton<IIdleMonitorBackgroundService, IdleMonitorBackgroundService>();
@@ -87,7 +84,6 @@ namespace GrpcGreeter
             _services.AddSingleton<INvidiaSmiParser, NvidiaSmiParser>();
             _services.AddSingleton<INvidiaSmiExecutor, NvidiaSmiExecutor>();
 
-            _services.AddSingleton<IGpuMonitoringBackgroundService2, GpuMonitoringBackgroundService2>();
             _services.AddSingleton<IGpuMonitor, GpuMonitor>();
             _services.AddSingleton(new HttpClient());
 
@@ -99,8 +95,8 @@ namespace GrpcGreeter
             _services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(_cancellationTokenSource.Token));
 
             _services.AddHostedService<Collier.Host.GpuMonitoringBackgroundService>();
-            _services.AddHostedService<Collier.Host.IdleMonitoringBackgroundService>();
-            _services.AddHostedService<Collier.Host.EventCoordinatorBackgroundService>();
+            //_services.AddHostedService<Collier.Host.IdleMonitoringBackgroundService>();
+            //_services.AddHostedService<Collier.Host.EventCoordinatorBackgroundService>();
 
             //TODO why doesnt this approach work?  Make a sample project and post on stack overflow?
 

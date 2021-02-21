@@ -1,8 +1,10 @@
 ﻿using System.Net;
+using System.Net.Http;
 using Castle.Core.Logging;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Collier.Mining;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TestingUtilities;
@@ -50,6 +52,19 @@ namespace CollierTests.Mining
 
         [Fact]
         public async void IsRunningAsyncWhenResultCodeFails()
+        {
+            var mockLogger = new Mock<ILogger<TrexWebClient>>();
+            var settings = new TrexWebClient.Settings() { StatusUrl = "http://localhost" };
+            var socketException = new System.Net.Sockets.SocketException(10061);  //connection refused
+            var ex = new HttpRequestException("test", socketException);
+            var httpClient = HttpClientMock.GetResponseThatThrowsException(ex);
+            var webClient = new TrexWebClient(mockLogger.Object, Options.Create(settings), httpClient);
+
+            (await webClient.IsRunningAsync()).Should().Be(false, "We should swallow the conenction refused exception");
+        }
+
+        [Fact]
+        public async void IsNotRunningAsyncWhenConnectionFails()
         {
             var mockLogger = new Mock<ILogger<TrexWebClient>>();
             var settings = new TrexWebClient.Settings() { StatusUrl = "http://localhost" };
