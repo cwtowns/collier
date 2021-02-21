@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CollierService.Monitoring.Gpu;
 using Microsoft.Extensions.Logging;
 
 namespace Collier.Mining
@@ -46,6 +47,11 @@ namespace Collier.Mining
             try
             {
                 result = await _httpClient.GetStringAsync(_settings.StatusUrl);
+            }
+            catch (HttpRequestException re)
+            {
+                _logger.LogError(re, "IsMiningAsync:  ");
+                throw;
             }
             catch (Exception e)
             {
@@ -100,6 +106,18 @@ namespace Collier.Mining
             {
                 var result = await _httpClient.GetAsync(_settings.StatusUrl);
                 return result.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException re)
+            {
+                if (re.InnerException is System.Net.Sockets.SocketException)
+                {
+                    //i used to check for the socket error code but oddly could not successfully mock this in GitHub
+                    _logger.LogInformation("Connection refused.  Miner should not be running.");
+                        return false;
+                }
+                _logger.LogInformation(re, "IsMiningAsync:  ");
+                throw new ArgumentOutOfRangeException(
+                    "this is a response exception but its inner exception is not the right type", re);
             }
             catch (Exception e)
             {

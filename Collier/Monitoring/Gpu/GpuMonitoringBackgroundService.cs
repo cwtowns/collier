@@ -5,34 +5,44 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Collier.Mining;
+using CollierService.Monitoring.Gpu;
 
 namespace Collier.Monitoring.Gpu
 {
-    public class GpuMonitoringBackgroundService : IGpuMonitoringBackgroundService, IBackgroundService<GpuMonitoringBackgroundService>
+    public class GpuMonitoringBackgroundService : IBackgroundService<GpuMonitoringBackgroundService>, IGpuMonitoringBackgroundService
     {
         public class Settings
         {
             public int PollingIntervalInSeconds { get; set; }
         }
 
-        public event EventHandler<GpuIdleEvent> IdleThresholdReached;
+        public event EventHandler<GpuProcessEvent> ProcessEventTriggered;
 
         private readonly ILogger<GpuMonitoringBackgroundService> _logger;
-        private readonly IGpuMonitor _gpuMonitor;
+        private readonly INvidiaSmiExecutor _smiExecutor;
         private readonly Settings _settings;
         private readonly IMiner _miner;
+        private readonly IGpuProcessMonitor<GpuProcessEvent> _smiProcessor;
 
-        public GpuMonitoringBackgroundService(ILogger<GpuMonitoringBackgroundService> logger, IGpuMonitor gpuMonitor, IOptions<Settings> settings, IMiner miner)
+        public GpuMonitoringBackgroundService(ILogger<GpuMonitoringBackgroundService> logger, IOptions<Settings> settings, IMiner miner, INvidiaSmiExecutor smiExecutor, IGpuProcessMonitor<GpuProcessEvent> smiProcessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _gpuMonitor = gpuMonitor ?? throw new ArgumentNullException(nameof(gpuMonitor));
+            _smiExecutor = smiExecutor ?? throw new ArgumentNullException(nameof(smiExecutor));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings.Value));
             _miner = miner ?? throw new ArgumentNullException(nameof(miner));
+            _smiProcessor = smiProcessor ?? throw new ArgumentNullException(nameof(smiProcessor));
 
             _logger.LogDebug("settings:  {pollInternal} ", _settings.PollingIntervalInSeconds);
-            logger.LogDebug("GpuMonitoringBackgroundService Created");
+            _logger.LogDebug("GpuMonitoringBackgroundService Created");
 
+            _smiProcessor.GpuActivityNoticed += CheckActivity;
         }
+
+        public void CheckActivity(object o, GpuProcessEvent e)
+        {
+            ProcessEventTriggered?.Invoke(this, e);
+        }
+
         public virtual async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("GpuMonitoringBackgroundService is starting.");
@@ -40,6 +50,9 @@ namespace Collier.Monitoring.Gpu
             stoppingToken.Register(() =>
                 _logger.LogInformation("GpuMonitoringBackgroundService is stopping."));
 
+            //it feels a little weird that this is here, as i don't know that starting the miner is this object's responsibilty.
+            //but one nice thing about it being here is I can test for it in a way that makes sense to me, as opposed to some
+            //generic BackgroundService object that does this work
             _miner.Start();
 
             while (!stoppingToken.IsCancellationRequested)
@@ -55,16 +68,12 @@ namespace Collier.Monitoring.Gpu
         {
             try
             {
-                //this should publish an event indicating we're idle
-                //the thing that subscribes to that event should monitor for how long we wait to be consdered GPU idle
-                //another thing is monitoring the user too, and publishing tht event
-                //there is a subscriber that looks for both events to be true and then starts mining
+                var commandOutput = await _smiExecutor.ExecuteCommandAsync();
 
-                var isUnderLoad = await _gpuMonitor.IsGpuUnderLoadAsync();
+                if (_smiExecutor.HasErrored)
+                    throw new ArgumentOutOfRangeException("unable to exeute smi program.  commandOutput:  " + commandOutput);
 
-                _logger.LogDebug("gpuIsUnderLoad:  {gpuIsUnderLoad}", isUnderLoad);
-
-                IdleThresholdReached?.Invoke(this, new GpuIdleEvent(DateTime.Now, !isUnderLoad));
+                _smiProcessor.CheckGpuOutput(commandOutput);
             }
             catch (Exception e)
             {

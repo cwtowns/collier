@@ -3,6 +3,9 @@ using Microsoft.Extensions.Options;
 using Collier.Monitoring.Gpu;
 using System.Collections.Generic;
 using System.Text;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace CollierTests.Monitoring
@@ -10,12 +13,12 @@ namespace CollierTests.Monitoring
     public class GpuMonitorProcessListTests
     {
         [Fact]
-        public void UnderLoadWhenPathMatches()
+        public void UnderLoadWhenProcessMatches()
         {
             var settings = new GpuMonitorOutputParser_ProcessList.Settings() { ValidGamePaths = new List<string>() { @"C:\Windows\System32" } };
             var options = Options.Create(settings);
 
-            var objectUnderTest = new GpuMonitorOutputParser_ProcessList(new NvidiaSmiParser(), options);
+            var objectUnderTest = new GpuMonitorOutputParser_ProcessList(new NvidiaSmiParser(), options, new Mock<ILogger<GpuMonitorOutputParser_ProcessList>>().Object);
             var processOutput = new StringBuilder();
 
             processOutput.AppendLine(@"GPU 00000000:02:00.0");
@@ -29,8 +32,7 @@ namespace CollierTests.Monitoring
             processOutput.AppendLine(@"            Name                          : C:\Windows\System32\another.exe");
             processOutput.AppendLine(@"            Used GPU Memory               : Not available in WDDM driver model");
 
-
-            objectUnderTest.IsGpuUnderLoad(processOutput.ToString()).Should().Be(false, "there are no processes in the parser that match the list.");
+            objectUnderTest.IsGpuUnderLoad(processOutput.ToString()).Should().Be(true, "there are processes in the parser that match the list.");
         }
 
         [Fact]
@@ -38,7 +40,7 @@ namespace CollierTests.Monitoring
         {
             var settings = new GpuMonitorOutputParser_ProcessList.Settings() { ValidGamePaths = new List<string>() { @"C:\Windows\foo" } };
             var options = Options.Create(settings);
-            var objectUnderTest = new GpuMonitorOutputParser_ProcessList(new NvidiaSmiParser(), options);
+            var objectUnderTest = new GpuMonitorOutputParser_ProcessList(new NvidiaSmiParser(), options, new Mock<ILogger<GpuMonitorOutputParser_ProcessList>>().Object);
             var processOutput = new StringBuilder();
 
             processOutput.AppendLine(@"GPU 00000000:02:00.0");
