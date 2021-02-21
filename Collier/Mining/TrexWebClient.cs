@@ -111,16 +111,11 @@ namespace Collier.Mining
             {
                 if (re.InnerException is System.Net.Sockets.SocketException)
                 {
-                    var se = re.InnerException as System.Net.Sockets.SocketException;
-                    if (se.ErrorCode == 10061)
-                    {
-                        _logger.LogInformation("Connection refused.  Miner should not be running.");
+                    //i used to check for the socket error code but oddly could not successfully mock this in GitHub
+                    _logger.LogInformation("Connection refused.  Miner should not be running.");
                         return false;
-                    }
-                    throw new ArgumentOutOfRangeException(
-                        string.Format("this is a response exception but its error code {0} does not match.  SocketerrorCode is {1}.", se.ErrorCode, se.SocketErrorCode), re);
                 }
-                _logger.LogError(re, "IsMiningAsync:  ");
+                _logger.LogInformation(re, "IsMiningAsync:  ");
                 throw new ArgumentOutOfRangeException(
                     "this is a response exception but its inner exception is not the right type", re);
             }

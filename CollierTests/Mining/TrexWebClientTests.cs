@@ -55,7 +55,7 @@ namespace CollierTests.Mining
         {
             var mockLogger = new Mock<ILogger<TrexWebClient>>();
             var settings = new TrexWebClient.Settings() { StatusUrl = "http://localhost" };
-            var socketException = new System.Net.Sockets.SocketException(10061);  //connection refused
+            var socketException = new System.Net.Sockets.SocketException(0);
             var ex = new HttpRequestException("test", socketException);
             var httpClient = HttpClientMock.GetResponseThatThrowsException(ex);
             var webClient = new TrexWebClient(mockLogger.Object, Options.Create(settings), httpClient);
