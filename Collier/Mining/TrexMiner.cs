@@ -90,7 +90,7 @@ namespace Collier.Mining
             if (process == null || process.HasExited)
                 return;
 
-            _webClient.PauseAsync();
+            process.Kill(true);
         }
     }
 }

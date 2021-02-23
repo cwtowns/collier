@@ -10,6 +10,9 @@ namespace GrpcGreeter
 {
     public class Program
     {
+        //TODO we can't pause the miner when we want to game, we have to stop it.
+        //the DAG stays loaded and chews up a chunk of ram that's needed to get good performance during gaming
+
         //TODO can I keep color output?  I dislike my log right now and color output would be very nice.
 
         //TODO can it automatically pause when a process is detected?  that could be cool.  It doesn't look like this takes a lot of resources at all.
@@ -33,6 +36,11 @@ namespace GrpcGreeter
         //ultimately my client is going to want to also stream log info from the entire application / get status remotely
 
         //TOOD how does running as a service work?
+        //https://mcilis.medium.com/how-to-publish-net-core-grpc-server-as-a-windows-service-dd562a1e263d
+        //puslishing models
+        //https://docs.microsoft.com/en-us/dotnet/core/deploying/
+        //creating the installer using WIX
+        //https://nblumhardt.com/2017/04/netcore-msi/
         //once I set this up I can run the dev platform with a fake process that acts like the miner so I can iterate on this
         //while still mining via my installed service
 

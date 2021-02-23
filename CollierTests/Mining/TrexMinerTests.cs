@@ -51,17 +51,17 @@ namespace CollierTests.Mining
             methodCalled.Should().Be(true, "we should invoke the web client when the process is running.");
         }
         [Fact]
-        public void StopCallsPauseWhenTheProcessIsStillRunning()
+        public void StopKillsWhenTheProcessIsStillRunning()
         {
             var methodCalled = false;
             var mockWebClient = new Mock<ITrexWebClient>();
-            mockWebClient.Setup(x => x.PauseAsync()).Callback(() => methodCalled = true);
 
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
             var factory = new Mock<IMinerProcessFactory>();
             var process = new Mock<IProcess>();
             process.Setup(x => x.HasExited).Returns(false);
+            process.Setup(x => x.Kill(It.IsAny<bool>())).Callback(() => methodCalled = true);
             var spawned = false;
 
             factory.Setup(x => x.GetNewOrExistingProcessAsync()).ReturnsAsync(() =>
@@ -82,7 +82,8 @@ namespace CollierTests.Mining
             miner.Start();
             miner.Stop();
 
-            methodCalled.Should().Be(true, "we should invoke the web client pause method when the process is running.");
+            //this is because pausing t-rex doesn't free memory.  The DAG persists and that kills gaming performance
+            methodCalled.Should().Be(true, "we kill the web client when the process is running.");
         }
 
 
