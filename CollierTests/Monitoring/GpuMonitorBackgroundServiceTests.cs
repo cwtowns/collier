@@ -137,6 +137,60 @@ namespace CollierTests.Monitoring
 
             capturedEvent.ActiveProcesses.Count.Should().Be(2, "because we said two processes were running in the watch list.");
         }
+
+        [Fact]
+        public void ProcessEventWithProcessesShouldStopMining()
+        {
+            var minerMock = new Mock<IMiner>();
+            var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
+            var parser = new NvidiaSmiParser();
+
+
+            var outputParserSettings = new GpuMonitorOutputParser_ProcessList.Settings();
+            outputParserSettings.ValidGamePaths.Add(@" C:\Windows\System32\ ");
+
+            var outputProcessor = new GpuMonitorOutputParser_ProcessList(parser,
+                Options.Create(outputParserSettings),
+                new Mock<ILogger<GpuMonitorOutputParser_ProcessList>>().Object);
+
+
+            var executor = new Mock<INvidiaSmiExecutor>();
+            var backgroundService = new GpuMonitoringBackgroundService(
+                new Mock<ILogger<GpuMonitoringBackgroundService>>().Object,
+                Options.Create(settings), minerMock.Object,
+                executor.Object, outputProcessor);
+
+            backgroundService.CheckActivity(this, new GpuProcessEvent(new List<string>() { "some gaming process" }));
+
+            minerMock.Verify(x => x.Stop(), Times.AtLeastOnce, "a process event with content should stop gaming.");
+        }
+
+        [Fact]
+        public void ProcessEventWithNoProcessesShouldStartMining()
+        {
+            var minerMock = new Mock<IMiner>();
+            var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
+            var parser = new NvidiaSmiParser();
+
+
+            var outputParserSettings = new GpuMonitorOutputParser_ProcessList.Settings();
+            outputParserSettings.ValidGamePaths.Add(@" C:\Windows\System32\ ");
+
+            var outputProcessor = new GpuMonitorOutputParser_ProcessList(parser,
+                Options.Create(outputParserSettings),
+                new Mock<ILogger<GpuMonitorOutputParser_ProcessList>>().Object);
+
+
+            var executor = new Mock<INvidiaSmiExecutor>();
+            var backgroundService = new GpuMonitoringBackgroundService(
+                new Mock<ILogger<GpuMonitoringBackgroundService>>().Object,
+                Options.Create(settings), minerMock.Object,
+                executor.Object, outputProcessor);
+
+            backgroundService.CheckActivity(this, new GpuProcessEvent(new List<string>()));
+
+            minerMock.Verify(x => x.Start(), Times.AtLeastOnce, "a process event with content should stop gaming.");
+        }
     }
 
 

@@ -40,7 +40,12 @@ namespace Collier.Monitoring.Gpu
 
         public void CheckActivity(object o, GpuProcessEvent e)
         {
-            ProcessEventTriggered?.Invoke(this, e);
+            ProcessEventTriggered?.Invoke(o, e);
+
+            if (e.ActiveProcesses.Count > 0)
+                _miner.Stop();
+            else
+                _miner.Start();
         }
 
         public virtual async Task ExecuteAsync(CancellationToken stoppingToken)
