@@ -38,14 +38,15 @@ namespace Collier.Monitoring.Gpu
             _smiProcessor.GpuActivityNoticed += CheckActivity;
         }
 
-        public void CheckActivity(object o, GpuProcessEvent e)
+        public async void CheckActivity(object o, GpuProcessEvent e)
         {
             ProcessEventTriggered?.Invoke(o, e);
+            var minerRunning = await _miner.IsRunningAsync();
 
-            if (e.ActiveProcesses.Count > 0)
-                _miner.Stop();
-            else
+            if (e.ActiveProcesses.Count == 0 && !minerRunning)
                 _miner.Start();
+            else if (e.ActiveProcesses.Count > 0 && minerRunning)
+                _miner.Stop();
         }
 
         public virtual async Task ExecuteAsync(CancellationToken stoppingToken)
