@@ -41,6 +41,7 @@ namespace Collier.Monitoring.Gpu
         public async void CheckActivity(object o, GpuProcessEvent e)
         {
             ProcessEventTriggered?.Invoke(o, e);
+            
             var minerRunning = await _miner.IsRunningAsync();
 
             if (e.ActiveProcesses.Count == 0 && !minerRunning)
