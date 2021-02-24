@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Collier.Host;
 using Collier.IO;
@@ -29,6 +30,8 @@ namespace Collier.Mining
 
         private readonly string _fullyQualfiedMiner;
 
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+
         public MinerProcessFactory(ILogger<MinerProcessFactory> logger, IApplicationCancellationTokenFactory cancelFactory, ProcessFactory processFactory, ITrexWebClient webClient,
             IOptions<TrexMiner.Settings> minerSettings, IOptions<TrexWebClient.Settings> webClientSettings)
         {
@@ -44,32 +47,40 @@ namespace Collier.Mining
 
         public virtual async Task<IProcess> GetNewOrExistingProcessAsync()
         {
+            await _lock.WaitAsync();
 
-            //i might want to check if it's responsive here too
-            //if our current process is still running return it
-            if (CurrentProcess != null && !CurrentProcess.HasExited)
+            try
             {
-                _logger.LogDebug("current process still exists and is running.");
-                return CurrentProcess;
+                //i might want to check if it's responsive here too
+                //if our current process is still running return it
+                if (CurrentProcess != null && !CurrentProcess.HasExited)
+                {
+                    _logger.LogDebug("current process still exists and is running.");
+                    return CurrentProcess;
+                }
+
+
+                _logger.LogDebug("current process does not exist, attempting to kill rogue processes");
+                //otherwise make sure there are no other processes before we start a new one
+                await KillAllRogueProcessesAsync();
+
+                if (_processFactory.GetExistingProcessList(_minerSettings.ExeFileName).Count > 0)
+                    throw new Exception("Process still exist after kill commands issued.");
+
+                _logger.LogDebug("spawning new process");
+                return CurrentProcess = _processFactory.GetProcess(new ProcessStartInfo
+                {
+                    FileName = _fullyQualfiedMiner,
+                    Arguments = _minerSettings.ExeArguments,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                });
             }
-
-
-            _logger.LogDebug("current process does not exist, attempting to kill rogue processes");
-            //otherwise make sure there are no other processes before we start a new one
-            await KillAllRogueProcessesAsync();
-
-            if (_processFactory.GetExistingProcessList(_minerSettings.ExeFileName).Count > 0)
-                throw new Exception("Process still exist after kill commands issued.");
-
-            _logger.LogDebug("spawning new process");
-            return CurrentProcess = _processFactory.GetProcess(new ProcessStartInfo
+            finally
             {
-                FileName = _fullyQualfiedMiner,
-                Arguments = _minerSettings.ExeArguments,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            });
+                _lock.Release();
+            }
         }
 
 

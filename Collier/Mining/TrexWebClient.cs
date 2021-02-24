@@ -40,23 +40,20 @@ namespace Collier.Mining
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async virtual Task<bool> IsMiningAsync()
+        public virtual async Task<bool> IsMiningAsync()
         {
-            string result = string.Empty;
+            string result;
 
             try
             {
                 result = await _httpClient.GetStringAsync(_settings.StatusUrl);
             }
-            catch (HttpRequestException re)
-            {
-                _logger.LogError(re, "IsMiningAsync:  ");
-                throw;
-            }
             catch (Exception e)
             {
+                if (LogConnectionRefusedException(e, "PauseAsync"))
+                    return false;
                 _logger.LogError(e, "IsMiningAsync:  ");
-                throw;
+                return false;
             }
 
             var jsonObject = JObject.Parse(result);
@@ -64,7 +61,7 @@ namespace Collier.Mining
             return (jsonObject.Value<int>("hashrate") > 0);
         }
 
-        public async virtual Task PauseAsync()
+        public virtual async Task PauseAsync()
         {
             try
             {
@@ -72,11 +69,13 @@ namespace Collier.Mining
             }
             catch (Exception e)
             {
+                if (LogConnectionRefusedException(e, "PauseAsync"))
+                    return;
                 _logger.LogError(e, "PauseAsync:  ");
             }
         }
 
-        public async virtual Task ResumeAsync()
+        public virtual async Task ResumeAsync()
         {
             try
             {
@@ -84,11 +83,13 @@ namespace Collier.Mining
             }
             catch (Exception e)
             {
+                if (LogConnectionRefusedException(e, "ResumeAsync"))
+                    return;
                 _logger.LogError(e, "ResumeAsync:  ");
             }
         }
 
-        public async virtual Task ShutdownAsync()
+        public virtual async Task ShutdownAsync()
         {
             try
             {
@@ -96,35 +97,41 @@ namespace Collier.Mining
             }
             catch (Exception e)
             {
+                if (LogConnectionRefusedException(e, "ShutdownAsync"))
+                    return;
                 _logger.LogError(e, "ShutdownAsync:  ");
             }
         }
 
-        public async virtual Task<bool> IsRunningAsync()
+        public virtual async Task<bool> IsRunningAsync()
         {
             try
             {
                 var result = await _httpClient.GetAsync(_settings.StatusUrl);
                 return result.IsSuccessStatusCode;
             }
-            catch (HttpRequestException re)
-            {
-                if (re.InnerException is System.Net.Sockets.SocketException)
-                {
-                    //i used to check for the socket error code but oddly could not successfully mock this in GitHub
-                    _logger.LogInformation("Connection refused.  Miner should not be running.");
-                        return false;
-                }
-                _logger.LogInformation(re, "IsMiningAsync:  ");
-                throw new ArgumentOutOfRangeException(
-                    "this is a response exception but its inner exception is not the right type", re);
-            }
             catch (Exception e)
             {
-                _logger.LogError(e, "IsRunningAsync:  ");
-            }
+                {
+                    if (LogConnectionRefusedException(e, "IsRunningAsync"))
+                        return false;
+                    _logger.LogError(e, "IsRunningAsync:  ");
+                }
 
+                return false;
+            }
+        }
+#nullable enable
+        private bool LogConnectionRefusedException(Exception e, string? callingMethod)
+        {
+            if (e is HttpRequestException re && re?.InnerException is System.Net.Sockets.SocketException)
+            {
+                //i used to check for the socket error code but oddly could not successfully mock this in GitHub
+                _logger.LogDebug("Exception from " + callingMethod + ".  Connection refused.  Miner should not be running.");
+                return true;
+            }
             return false;
         }
+#nullable disable
     }
 }

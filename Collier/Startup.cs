@@ -37,8 +37,12 @@ namespace GrpcGreeter
         {
             _services = services;
 
+            var rootDirectory = Environment.GetEnvironmentVariable(Program.ENV_VARIABLE_COLLIER_ROOT_DIRECTORY) ??
+                                throw new ArgumentNullException("env." + Program.ENV_VARIABLE_COLLIER_ROOT_DIRECTORY,
+                                    "This is normally set during Main execution.");
+
             _configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(rootDirectory)
                 .AddJsonFile("appsettings.json", optional: false)
                 .AddJsonFile("minersettings.private.json", optional: false)
                 .AddEnvironmentVariables()

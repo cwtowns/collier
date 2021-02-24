@@ -86,13 +86,13 @@ namespace CollierTests.Mining
             methodCalled.Should().Be(true, "we kill the web client when the process is running.");
         }
 
-
         [Fact]
-        public void StartCallsResumeWhenTheProcessIsStillRunning()
+        public void StartDoesNotCallResumeWhenTheProcessIsStillRunningButMinerNotInitialized()
         {
             var methodCallCount = 0;
             var mockWebClient = new Mock<ITrexWebClient>();
             mockWebClient.Setup(x => x.ResumeAsync()).Callback(() => methodCallCount++);
+            mockWebClient.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
             var factory = new Mock<IMinerProcessFactory>();
@@ -120,7 +120,44 @@ namespace CollierTests.Mining
             miner.Start();
             miner.Start();
 
-            methodCallCount.Should().Be(1, "we should invoke the web client pause method when the process is running.");
+            methodCallCount.Should().Be(0, "we should not ask the web client to resume when the web client appears unresponsive");
+        }
+
+        [Fact]
+        public void StartCallsResumeOnlyWhenProcessIsResponding()
+        {
+            var methodCallCount = 0;
+            var mockWebClient = new Mock<ITrexWebClient>();
+            mockWebClient.Setup(x => x.ResumeAsync()).Callback(() => methodCallCount++);
+            mockWebClient.Setup(x => x.IsRunningAsync()).ReturnsAsync(false);
+            var logger = new Mock<ILogger<TrexMiner>>();
+            var settings = new TrexMiner.Settings();
+            var factory = new Mock<IMinerProcessFactory>();
+            var process = new Mock<IProcess>();
+            process.Setup(x => x.HasExited).Returns(false);
+
+            var spawned = false;
+
+            factory.Setup(x => x.GetNewOrExistingProcessAsync()).ReturnsAsync(() =>
+            {
+                spawned = true;
+                return process.Object;
+            });
+
+            factory.Setup(x => x.CurrentProcess).Returns(() =>
+            {
+                if (spawned)
+                    return process.Object;
+                return null;
+            });
+            process.Setup(x => x.HasExited).Returns(false);
+
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object);
+
+            miner.Start();
+            miner.Start();
+
+            methodCallCount.Should().Be(0, "we should only invoke the web client pause method when the process is running.");
         }
     }
 }

@@ -145,6 +145,7 @@ namespace CollierTests.Monitoring
             var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
             var parser = new NvidiaSmiParser();
 
+            minerMock.Setup(x => x.IsRunningAsync()).ReturnsAsync(true);
 
             var outputParserSettings = new GpuMonitorOutputParser_ProcessList.Settings();
             outputParserSettings.ValidGamePaths.Add(@" C:\Windows\System32\ ");
