@@ -37,6 +37,8 @@ namespace Collier.Monitoring.Gpu
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
 
+            _logger.LogDebug("{methodName}", "IsGpuUnderLoad");
+
             var eventList = GetMonitoredProcesses(output);
 
             //todo should this be async
@@ -83,7 +85,7 @@ namespace Collier.Monitoring.Gpu
 
                         if (app.Trim().StartsWith(s.Trim(), StringComparison.OrdinalIgnoreCase))
                         {
-                            _logger.LogDebug("found matching process {processPath}.", app);
+                            _logger.LogDebug("{methodName} {message} {processPath", "GetMonitoredProcesses", "Found matching process", app);
                             eventList.Add(app);
                         }
                     }

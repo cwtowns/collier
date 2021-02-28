@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CollierService.Mining;
 
 namespace Collier.Mining
 {
@@ -32,8 +33,9 @@ namespace Collier.Mining
         private readonly ITrexWebClient _webClient;
         private readonly IMinerProcessFactory _processFactory;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+        private readonly ITrexLogModifier _logModifier;
 
-        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory)
+        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, ITrexLogModifier logModifier)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -43,6 +45,8 @@ namespace Collier.Mining
             _settings.ExeFileName = _settings.ExeFileName ?? string.Empty;
             _settings.ExeLocation = _settings.ExeLocation ?? string.Empty;
             _settings.ExeArguments = _settings.ExeArguments ?? string.Empty;
+
+            _logModifier = logModifier ?? throw new ArgumentNullException((nameof(logModifier)));
         }
 
         public void Dispose()
@@ -94,18 +98,18 @@ namespace Collier.Mining
                 if (process == null || process.HasExited)
                 {
                     if (process == null)
-                        _logger.LogInformation("Spawning new process because old process is null.");
+                        _logger.LogInformation("{methodName} {message}", "Start", "Spawning new process because old process is null.");
                     else
-                        _logger.LogInformation("Spawning new process because old process has exited.");
+                        _logger.LogInformation("{methodName} {message}", "Start", "Spawning new process because old process has exited.");
                     process = await _processFactory.GetNewOrExistingProcessAsync();
                     process.OutputDataReceived += (sender, a) =>
                     {
                         if (!string.IsNullOrEmpty(a.Data))
-                            _logger.LogInformation(a.Data);
+                            _logger.LogInformation(_logModifier.ModifyLog(a.Data));
                     };
                     process.Start();
                     process.BeginOutputReadLine();
-                    _logger.LogDebug("process started, waiting for success status");
+                    _logger.LogInformation("{methodName} {message}", "Start", "process started, waiting for success status");
 
                     for (int x = 0; x < _settings.StartupDelayAttempts; x++)
                     {
@@ -113,19 +117,20 @@ namespace Collier.Mining
 
                         if (isRunning)
                         {
-                            _logger.LogInformation("Miner has completed starting.");
+                            _logger.LogInformation("{methodName} {message}", "Start", "Miner has completed starting.");
                             return;
                         }
 
-                        _logger.LogInformation("Waiting for miner process to completely start...");
+                        _logger.LogInformation("{methodName} {message}", "Start", "Waiting for miner process to completely start...");
                         await Task.Delay(_settings.StartupDelayInMs);
                     }
 
-                    _logger.LogError("Miner did not start after a certain number of attempts.  Try increasing StartupDelayInMs or StartupDelayAttempts in appsettings.json.");
+                    _logger.LogError("{methodName} {message}", "Start",
+                        "Miner did not start after a certain number of attempts.  Try increasing StartupDelayInMs or StartupDelayAttempts in appsettings.json.");
                     return;
                 }
 
-                _logger.LogInformation("Process already exists.");
+                _logger.LogInformation("{methodName} {message}", "Start", "Process already exists.");
 
                 if (!process.HasExited)
                 {
@@ -133,14 +138,15 @@ namespace Collier.Mining
 
                     if (!isRunning)
                     {
-                        _logger.LogWarning("Miner process is up and has not exited but isn't running yet.  " +
+                        _logger.LogWarning("{methodName} {message}", "Start", "Miner process is up and has not exited but isn't running yet.  " +
                             "Spawning of the process should have waited for this state to exist.  Is there an earlier error logged here?");
                         return;
                     }
 
                     if (await _webClient.IsMiningAsync())
                     {
-                        _logger.LogInformation("Process has not exited and it might be paused, asking existing process to resume.");
+                        _logger.LogInformation("{methodName} {message}", "Start",
+                            "Process has not exited and it might be paused, asking existing process to resume.");
                         await _webClient.ResumeAsync();
                     }
                 }
@@ -160,11 +166,11 @@ namespace Collier.Mining
 
                 if (process == null || process.HasExited)
                 {
-                    _logger.LogDebug("Stop requested but process has already exited.");
+                    _logger.LogDebug("{methodName} {message}", "Stop", "Process has already exited.");
                     return;
                 }
 
-                _logger.LogInformation("Stop requested and killing full process tree");
+                _logger.LogInformation("{methodName} {message}", "Stop", "Killing full process tree.");
                 process.Kill(true);
             }
             finally
