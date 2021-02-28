@@ -52,13 +52,13 @@ namespace Collier.Mining
             {
                 if (LogConnectionRefusedException(e, "PauseAsync"))
                     return false;
-                _logger.LogError(e, "IsMiningAsync:  ");
+                _logger.LogError(e, "{methodName}", "IsMiningAsync");
                 return false;
             }
 
             var jsonObject = JObject.Parse(result);
 
-            return (jsonObject.Value<int>("hashrate") > 0);
+            return jsonObject.Value<int>("hashrate") > 0;
         }
 
         public virtual async Task PauseAsync()
@@ -71,7 +71,7 @@ namespace Collier.Mining
             {
                 if (LogConnectionRefusedException(e, "PauseAsync"))
                     return;
-                _logger.LogError(e, "PauseAsync:  ");
+                _logger.LogError(e, "{methodName}", "PauseAsync");
             }
         }
 
@@ -85,7 +85,7 @@ namespace Collier.Mining
             {
                 if (LogConnectionRefusedException(e, "ResumeAsync"))
                     return;
-                _logger.LogError(e, "ResumeAsync:  ");
+                _logger.LogError(e, "{methodName}", "ResumeAsync");
             }
         }
 
@@ -99,7 +99,7 @@ namespace Collier.Mining
             {
                 if (LogConnectionRefusedException(e, "ShutdownAsync"))
                     return;
-                _logger.LogError(e, "ShutdownAsync:  ");
+                _logger.LogError(e, "{methodName}", "ShutdownAsync");
             }
         }
 
@@ -115,7 +115,7 @@ namespace Collier.Mining
                 {
                     if (LogConnectionRefusedException(e, "IsRunningAsync"))
                         return false;
-                    _logger.LogError(e, "IsRunningAsync:  ");
+                    _logger.LogError(e, "{methodName}", "IsRunningAsync");
                 }
 
                 return false;
@@ -127,7 +127,7 @@ namespace Collier.Mining
             if (e is HttpRequestException re && re?.InnerException is System.Net.Sockets.SocketException)
             {
                 //i used to check for the socket error code but oddly could not successfully mock this in GitHub
-                _logger.LogDebug("Exception from " + callingMethod + ".  Connection refused.  Miner should not be running.");
+                _logger.LogDebug("{methodName} {message}", callingMethod, "Connection refused exception received.  This means the miner isn't running.");
                 return true;
             }
             return false;

@@ -49,25 +49,28 @@ namespace Collier.Mining
         {
             await _lock.WaitAsync();
 
+            _logger.LogInformation("{methodName}", "GetNewOrExistingProcessAsync");
+
             try
             {
                 //i might want to check if it's responsive here too
                 //if our current process is still running return it
                 if (CurrentProcess != null && !CurrentProcess.HasExited)
                 {
-                    _logger.LogDebug("current process still exists and is running.");
+                    _logger.LogInformation("{methodName} {message}", "GetNewOrExistingProcessAsync", "current process still exists and is running.");
                     return CurrentProcess;
                 }
 
+                _logger.LogInformation("{methodName} {message}", "GetNewOrExistingProcessAsync", "current process does not exist, attempting to kill rogue processes");
 
-                _logger.LogDebug("current process does not exist, attempting to kill rogue processes");
                 //otherwise make sure there are no other processes before we start a new one
                 await KillAllRogueProcessesAsync();
 
                 if (_processFactory.GetExistingProcessList(_minerSettings.ExeFileName).Count > 0)
                     throw new Exception("Process still exist after kill commands issued.");
 
-                _logger.LogDebug("spawning new process");
+                _logger.LogInformation("{methodName} {message}", "GetNewOrExistingProcessAsync", "spawning new process");
+
                 return CurrentProcess = _processFactory.GetProcess(new ProcessStartInfo
                 {
                     FileName = _fullyQualfiedMiner,
@@ -89,20 +92,22 @@ namespace Collier.Mining
             var hasAttemptedShutdown = false;
             int sleepDuration = _webClientSettings.ShutdownTimeoutMaxMs / _webClientSettings.ShutdownTimeoutNumberOfChecks;
 
+            _logger.LogInformation("{methodName}", "KillAllRogueProcessesAsync");
+
             for (int x = 0; x < _webClientSettings.ShutdownTimeoutNumberOfChecks; x++)
             {
                 if (await _webClient.IsRunningAsync())
                 {
                     if (!hasAttemptedShutdown)
                     {
-                        _logger.LogDebug("attempting graceful web shutdown command");
+                        _logger.LogDebug("{methodName} {message}", "KillAllRogueProcessesAsync", "attempting graceful web shutdown command");
                         await _webClient.ShutdownAsync();
                         hasAttemptedShutdown = true;
                     }
                 }
                 else
                 {
-                    _logger.LogDebug("no web miner running");
+                    _logger.LogDebug("{methodName} {message}", "KillAllRogueProcessesAsync", "no web miner running");
                     break;
                 }
 
@@ -120,7 +125,7 @@ namespace Collier.Mining
         {
             int sleepDuration = _webClientSettings.ShutdownTimeoutMaxMs / _webClientSettings.ShutdownTimeoutNumberOfChecks;
 
-            _logger.LogDebug("manually killing external processes");
+            _logger.LogInformation("{methodName}", "KillRemainingMinersAsync");
             KillAllProcesses();
 
             await Task.Delay(sleepDuration, _cancelFactory.GetCancellationToken());
@@ -132,9 +137,8 @@ namespace Collier.Mining
             {
                 try
                 {
-                    _logger.LogDebug("attempting to manually kill pid {processId}", process.Id);
+                    _logger.LogDebug("{methodName} {message} {processId}", "KillAllProcesses", "attempting to manually kill pid {processId}", process.Id);
                     process.Kill(true);
-
                 }
                 catch (Exception)
                 {

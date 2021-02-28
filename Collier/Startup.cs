@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using Collier.Host;
+using CollierService.Mining;
 using CollierService.Monitoring.Gpu;
 using Serilog;
 using GpuMonitoringBackgroundService = Collier.Monitoring.Gpu.GpuMonitoringBackgroundService;
@@ -87,6 +88,7 @@ namespace GrpcGreeter
             _services.AddSingleton<ProcessFactory, ProcessFactory>();
             _services.AddSingleton<INvidiaSmiParser, NvidiaSmiParser>();
             _services.AddSingleton<INvidiaSmiExecutor, NvidiaSmiExecutor>();
+            _services.AddSingleton<ITrexLogModifier, DateStrippingTrexLogModifier>();
 
             _services.AddSingleton<IGpuMonitor, GpuMonitor>();
             _services.AddSingleton(new HttpClient());
