@@ -24,6 +24,17 @@ using GpuMonitoringBackgroundService = Collier.Monitoring.Gpu.GpuMonitoringBackg
 
 namespace GrpcGreeter
 {
+
+    /**
+     * TODO ux notes are here
+     *
+     * It should display the log so I can see activity (max lines are 86 chars long or more)
+     * It should show state (mining, idle, service not running)
+     * It should allow state change (manual pause or stop)
+     * It should show some summary info maybe like the hash rate, power usage, temp, crashes.
+     * long press on the log to get more details and have it take over the entire display.  That'd be neat.
+     *
+     */
     public class Startup
     {
         private IServiceCollection _services;
