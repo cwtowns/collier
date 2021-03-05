@@ -6,19 +6,25 @@ namespace Collier.Host
     public interface IApplicationCancellationTokenFactory
     {
         CancellationToken GetCancellationToken();
+        CancellationTokenSource GetCancellationSource();
     }
 
     public class DefaultCancellationTokenFactory : IApplicationCancellationTokenFactory
     {
-        private CancellationToken _token;
-        public DefaultCancellationTokenFactory(CancellationToken token)
+        private readonly CancellationTokenSource _source;
+        public DefaultCancellationTokenFactory(CancellationTokenSource tokenSource)
         {
-            _token = token;
+            _source = tokenSource;
+        }
+
+        public CancellationTokenSource GetCancellationSource()
+        {
+            return _source;
         }
 
         public virtual CancellationToken GetCancellationToken()
         {
-            return _token;
+            return _source.Token;
         }
     }
 }

@@ -10,6 +10,7 @@ using Collier.Mining;
 using Collier.Monitoring.Gpu;
 using Collier.Monitoring.Idle;
 using CollierService.Mining;
+using CollierService.Mining.OutputParsing;
 using CollierService.Monitoring.Gpu;
 using Microsoft.Extensions.Configuration;
 
@@ -17,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class CollierServiceCollectionExtensions
     {
-        public static string ENV_VARIABLE_COLLIER_ROOT_DIRECTORY = "COLLIER_ROOT_DIRECTORY";
+        public const string ENV_VARIABLE_COLLIER_ROOT_DIRECTORY = "COLLIER_ROOT_DIRECTORY";
 
         public static IServiceCollection AddCollier(
             this IServiceCollection services, IConfiguration config, CancellationTokenSource cancelTokenSource)
@@ -74,12 +75,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ProcessFactory, ProcessFactory>();
             services.AddSingleton<INvidiaSmiParser, NvidiaSmiParser>();
             services.AddSingleton<INvidiaSmiExecutor, NvidiaSmiExecutor>();
-            services.AddSingleton<ITrexLogModifier, DateStrippingTrexLogModifier>();
             services.AddSingleton<IGpuMonitor, GpuMonitor>();
             services.AddSingleton(new HttpClient());
+            services.AddSingleton<MinerLogSubject, MinerLogSubject>();
+
 
             services.AddSingleton<IMinerProcessFactory, MinerProcessFactory>();
-            services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(cancelTokenSource.Token));
+            services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(cancelTokenSource));
 
             services.AddHostedService<Collier.Host.GpuMonitoringBackgroundService>();
 

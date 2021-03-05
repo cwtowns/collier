@@ -62,6 +62,7 @@ namespace GrpcGreeter
                     {
                         log.AddSerilog(Log.Logger);
                     });
+
                 });
         }
     }

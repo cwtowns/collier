@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using CollierService.Mining;
+using CollierService.Mining.OutputParsing;
 
 namespace Collier.Mining
 {
@@ -33,9 +34,9 @@ namespace Collier.Mining
         private readonly ITrexWebClient _webClient;
         private readonly IMinerProcessFactory _processFactory;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-        private readonly ITrexLogModifier _logModifier;
+        private readonly MinerLogSubject _logSubject;
 
-        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, ITrexLogModifier logModifier)
+        public TrexMiner(ILogger<InternalLoggingFrameworkObserver> observerLogger, ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, MinerLogSubject logSubject)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -46,7 +47,9 @@ namespace Collier.Mining
             _settings.ExeLocation = _settings.ExeLocation ?? string.Empty;
             _settings.ExeArguments = _settings.ExeArguments ?? string.Empty;
 
-            _logModifier = logModifier ?? throw new ArgumentNullException((nameof(logModifier)));
+            _logSubject = logSubject ?? throw new ArgumentNullException((nameof(logSubject)));
+
+            _logSubject.Subscribe(new InternalLoggingFrameworkObserver(observerLogger, _logger, LogLevel.Information));
         }
 
         public void Dispose()
@@ -65,6 +68,7 @@ namespace Collier.Mining
             {
                 _lock.Release();
             }
+            GC.SuppressFinalize(this);
         }
 
         public async Task<bool> IsRunningAsync()
@@ -102,11 +106,13 @@ namespace Collier.Mining
                     else
                         _logger.LogInformation("{methodName} {message}", "Start", "Spawning new process because old process has exited.");
                     process = await _processFactory.GetNewOrExistingProcessAsync();
+
                     process.OutputDataReceived += (sender, a) =>
                     {
                         if (!string.IsNullOrEmpty(a.Data))
-                            _logger.LogInformation(_logModifier.ModifyLog(a.Data));
+                            _logSubject.SendMessage(a.Data);
                     };
+
                     process.Start();
                     process.BeginOutputReadLine();
                     _logger.LogInformation("{methodName} {message}", "Start", "process started, waiting for success status");
