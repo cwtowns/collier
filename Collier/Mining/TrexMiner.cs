@@ -5,7 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using CollierService.Mining;
+using Collier.Mining;
+using Collier.Mining.OutputParsing;
 
 namespace Collier.Mining
 {
@@ -33,9 +34,10 @@ namespace Collier.Mining
         private readonly ITrexWebClient _webClient;
         private readonly IMinerProcessFactory _processFactory;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-        private readonly ITrexLogModifier _logModifier;
 
-        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, ITrexLogModifier logModifier)
+        private readonly IMinerLogListener _listener;
+
+        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener, IInternalLoggingFrameworkObserver loggingFrameworkObserver)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -46,7 +48,16 @@ namespace Collier.Mining
             _settings.ExeLocation = _settings.ExeLocation ?? string.Empty;
             _settings.ExeArguments = _settings.ExeArguments ?? string.Empty;
 
-            _logModifier = logModifier ?? throw new ArgumentNullException((nameof(logModifier)));
+            _listener = listener ?? throw new ArgumentNullException(nameof(listener));
+
+            if (loggingFrameworkObserver == null)
+                throw new ArgumentNullException(nameof(loggingFrameworkObserver));
+
+            //i dont know a better spot to do this wire up which is frustrating.  
+            //it needs to happen after all dependencies are registered and before background services start
+            //I think the only way I can ensure that is to have it execute as part of an object I know
+            //is resolved when the miner is resolved
+            _listener.LogMessageReceived += loggingFrameworkObserver.ReceiveLogMessage;
         }
 
         public void Dispose()
@@ -65,6 +76,7 @@ namespace Collier.Mining
             {
                 _lock.Release();
             }
+            GC.SuppressFinalize(this);
         }
 
         public async Task<bool> IsRunningAsync()
@@ -102,11 +114,13 @@ namespace Collier.Mining
                     else
                         _logger.LogInformation("{methodName} {message}", "Start", "Spawning new process because old process has exited.");
                     process = await _processFactory.GetNewOrExistingProcessAsync();
+
                     process.OutputDataReceived += (sender, a) =>
                     {
                         if (!string.IsNullOrEmpty(a.Data))
-                            _logger.LogInformation(_logModifier.ModifyLog(a.Data));
+                            _listener.ReceiveLogMessage(this, new LogMessage() { Message = a.Data });
                     };
+
                     process.Start();
                     process.BeginOutputReadLine();
                     _logger.LogInformation("{methodName} {message}", "Start", "process started, waiting for success status");

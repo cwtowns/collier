@@ -4,16 +4,15 @@ using Microsoft.Extensions.Options;
 using Collier.IO;
 using Collier.Mining;
 using Moq;
-using System.Diagnostics;
-using CollierService.Mining;
+using Collier.Mining.OutputParsing;
 using Xunit;
 
 namespace CollierTests.Mining
 {
     public class TrexMinerTests
     {
-        private static ILogger<DateStrippingTrexLogModifier> _fakeLogger =
-            new Mock<ILogger<DateStrippingTrexLogModifier>>().Object;
+        private static readonly ILogger<InternalLoggingFrameworkObserver> logObserver =
+            new Mock<ILogger<InternalLoggingFrameworkObserver>>().Object;
 
         [Fact]
         public async void WebMinerIsCheckedWhenProcessIsDead()
@@ -25,8 +24,10 @@ namespace CollierTests.Mining
             var logger = new Mock<ILogger<TrexMiner>>();
             var settings = new TrexMiner.Settings();
             var factory = new Mock<IMinerProcessFactory>();
+            var mockLogListener = new Mock<IMinerLogListener>();
+            var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, new DateStrippingTrexLogModifier(_fakeLogger));
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             await miner.IsRunningAsync();
 
@@ -44,10 +45,13 @@ namespace CollierTests.Mining
             var settings = new TrexMiner.Settings();
             var factory = new Mock<IMinerProcessFactory>();
             var process = new Mock<IProcess>();
+            var mockLogListener = new Mock<IMinerLogListener>();
+            var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
             factory.Setup(x => x.GetNewOrExistingProcessAsync()).ReturnsAsync(process.Object);
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, new DateStrippingTrexLogModifier(_fakeLogger));
+
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             miner.Start();
             await miner.IsRunningAsync();
@@ -81,7 +85,10 @@ namespace CollierTests.Mining
                 return null;
             });
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, new DateStrippingTrexLogModifier(_fakeLogger));
+            var mockLogListener = new Mock<IMinerLogListener>();
+            var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
+
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             miner.Start();
             miner.Stop();
@@ -119,7 +126,10 @@ namespace CollierTests.Mining
             });
             process.Setup(x => x.HasExited).Returns(false);
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, new DateStrippingTrexLogModifier(_fakeLogger));
+            var mockLogListener = new Mock<IMinerLogListener>();
+            var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
+
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             miner.Start();
             miner.Start();
@@ -156,7 +166,10 @@ namespace CollierTests.Mining
             });
             process.Setup(x => x.HasExited).Returns(false);
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, new DateStrippingTrexLogModifier(_fakeLogger));
+            var mockLogListener = new Mock<IMinerLogListener>();
+            var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
+
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             miner.Start();
             miner.Start();

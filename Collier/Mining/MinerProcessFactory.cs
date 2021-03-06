@@ -18,15 +18,15 @@ namespace Collier.Mining
 
     public class MinerProcessFactory : IMinerProcessFactory
     {
-        private ProcessFactory _processFactory;
-        private ITrexWebClient _webClient;
+        private readonly ProcessFactory _processFactory;
+        private readonly ITrexWebClient _webClient;
         public virtual IProcess CurrentProcess { get; private set; }
 
-        private IApplicationCancellationTokenFactory _cancelFactory;
-        private TrexMiner.Settings _minerSettings;
-        private TrexWebClient.Settings _webClientSettings;
+        private readonly IApplicationCancellationTokenFactory _cancelFactory;
+        private readonly TrexMiner.Settings _minerSettings;
+        private readonly TrexWebClient.Settings _webClientSettings;
 
-        private ILogger<MinerProcessFactory> _logger;
+        private readonly ILogger<MinerProcessFactory> _logger;
 
         private readonly string _fullyQualfiedMiner;
 

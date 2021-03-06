@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using CollierService.Monitoring.Gpu;
+using Collier.Monitoring.Gpu;
 using Microsoft.Extensions.Logging;
 
 namespace Collier.Monitoring.Gpu

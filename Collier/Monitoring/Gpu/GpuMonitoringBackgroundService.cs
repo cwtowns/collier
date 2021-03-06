@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Collier.Mining;
-using CollierService.Monitoring.Gpu;
+using Collier.Monitoring.Gpu;
 
 namespace Collier.Monitoring.Gpu
 {
@@ -41,19 +41,29 @@ namespace Collier.Monitoring.Gpu
 
         public async void CheckActivity(object o, GpuProcessEvent e)
         {
-            ProcessEventTriggered?.Invoke(o, e);
-
-            var minerRunning = await _miner.IsRunningAsync();
-
-            if (e.ActiveProcesses.Count == 0 && !minerRunning)
+            try
             {
-                _logger.LogInformation("{methodName} {message}", "CheckActivity", "Starting mining because no processes are running.");
-                _miner.Start();
+                ProcessEventTriggered?.Invoke(o, e);
+
+                var minerRunning = await _miner.IsRunningAsync();
+
+                if (e.ActiveProcesses.Count == 0 && !minerRunning)
+                {
+                    _logger.LogInformation("{methodName} {message}", "CheckActivity",
+                        "Starting mining because no processes are running.");
+                    _miner.Start();
+                }
+                else if (e.ActiveProcesses.Count > 0 && minerRunning)
+                {
+                    _logger.LogInformation("{methodName} {message} {processList}", "CheckActivity",
+                        "Stopping mining because the following processes were found",
+                        string.Join(',', e.ActiveProcesses));
+                    _miner.Stop();
+                }
             }
-            else if (e.ActiveProcesses.Count > 0 && minerRunning)
+            catch (Exception err)
             {
-                _logger.LogInformation("{methodName} {message} {processList}", "CheckActivity", "Stopping mining because the following processes were found", string.Join(',', e.ActiveProcesses));
-                _miner.Stop();
+                _logger.LogError(err, "{methodName} {message}", "CheckActivity", "error during async processing");
             }
         }
 
