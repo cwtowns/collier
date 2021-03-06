@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Collier.Mining;
-using CollierService.Monitoring.Gpu;
+using Collier.Monitoring.Gpu;
 
 namespace Collier.Monitoring.Gpu
 {

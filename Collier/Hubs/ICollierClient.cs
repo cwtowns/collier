@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CollierService.Hubs
+namespace Collier.Hubs
 {
     public interface ICollierClient
     {

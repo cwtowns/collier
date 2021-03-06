@@ -6,7 +6,7 @@ using Collier.Host;
 using Collier.Mining;
 using Microsoft.AspNetCore.SignalR;
 
-namespace CollierService.Hubs
+namespace Collier.Hubs
 {
     public class CollierHub : Hub<ICollierClient>
     {

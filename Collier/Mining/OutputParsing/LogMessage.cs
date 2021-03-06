@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CollierService.Mining.OutputParsing
+namespace Collier.Mining.OutputParsing
 {
     public class LogMessage
     {

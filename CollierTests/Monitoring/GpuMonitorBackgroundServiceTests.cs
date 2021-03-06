@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Collier.Mining;
-using CollierService.Monitoring.Gpu;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace CollierTests.Monitoring

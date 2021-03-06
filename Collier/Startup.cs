@@ -16,9 +16,6 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
-using Collier.Host;
-using CollierService.Mining;
-using CollierService.Monitoring.Gpu;
 using Serilog;
 using GpuMonitoringBackgroundService = Collier.Monitoring.Gpu.GpuMonitoringBackgroundService;
 

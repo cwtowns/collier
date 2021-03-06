@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using CollierService.Monitoring.Gpu;
+using Collier.Monitoring.Gpu;
 using Microsoft.Extensions.Logging;
 
 namespace Collier.Mining

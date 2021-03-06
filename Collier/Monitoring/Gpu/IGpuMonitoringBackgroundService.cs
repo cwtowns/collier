@@ -1,6 +1,6 @@
 ﻿using Collier.Host;
 using System;
-using CollierService.Monitoring.Gpu;
+using Collier.Monitoring.Gpu;
 
 namespace Collier.Monitoring.Gpu
 {

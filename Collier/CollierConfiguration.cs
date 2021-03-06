@@ -9,9 +9,7 @@ using Collier.IO;
 using Collier.Mining;
 using Collier.Monitoring.Gpu;
 using Collier.Monitoring.Idle;
-using CollierService.Mining;
-using CollierService.Mining.OutputParsing;
-using CollierService.Monitoring.Gpu;
+using Collier.Mining.OutputParsing;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -77,12 +75,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<INvidiaSmiExecutor, NvidiaSmiExecutor>();
             services.AddSingleton<IGpuMonitor, GpuMonitor>();
             services.AddSingleton(new HttpClient());
-            services.AddSingleton<MinerLogSubject, MinerLogSubject>();
 
 
             services.AddSingleton<IMinerProcessFactory, MinerProcessFactory>();
             services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(cancelTokenSource));
 
+            services.AddSingleton<IMinerLogListener, MinerListener>();
+
+            services.AddSingleton<IInitializationProcedure, InternalLoggingFrameworkObserver>();
+
+            services.AddHostedService<InitService>();
             services.AddHostedService<Collier.Host.GpuMonitoringBackgroundService>();
 
             return services;

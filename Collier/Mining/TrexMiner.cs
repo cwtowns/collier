@@ -5,8 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using CollierService.Mining;
-using CollierService.Mining.OutputParsing;
+using Collier.Mining;
+using Collier.Mining.OutputParsing;
 
 namespace Collier.Mining
 {
@@ -34,9 +34,10 @@ namespace Collier.Mining
         private readonly ITrexWebClient _webClient;
         private readonly IMinerProcessFactory _processFactory;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-        private readonly MinerLogSubject _logSubject;
 
-        public TrexMiner(ILogger<InternalLoggingFrameworkObserver> observerLogger, ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, MinerLogSubject logSubject)
+        private readonly IMinerLogListener _listener;
+
+        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -47,9 +48,7 @@ namespace Collier.Mining
             _settings.ExeLocation = _settings.ExeLocation ?? string.Empty;
             _settings.ExeArguments = _settings.ExeArguments ?? string.Empty;
 
-            _logSubject = logSubject ?? throw new ArgumentNullException((nameof(logSubject)));
-
-            _logSubject.Subscribe(new InternalLoggingFrameworkObserver(observerLogger, _logger, LogLevel.Information));
+            _listener = listener ?? throw new ArgumentNullException(nameof(listener));
         }
 
         public void Dispose()
@@ -110,7 +109,7 @@ namespace Collier.Mining
                     process.OutputDataReceived += (sender, a) =>
                     {
                         if (!string.IsNullOrEmpty(a.Data))
-                            _logSubject.SendMessage(a.Data);
+                            _listener.ReceiveLogMessage(this, new LogMessage() { Message = a.Data });
                     };
 
                     process.Start();

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CollierService.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public interface IGpuProcessMonitor<T>
     {

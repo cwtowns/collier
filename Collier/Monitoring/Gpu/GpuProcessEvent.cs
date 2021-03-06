@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CollierService.Monitoring.Gpu
+namespace Collier.Monitoring.Gpu
 {
     public class GpuProcessEvent
     {

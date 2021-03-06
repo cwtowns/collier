@@ -25,7 +25,7 @@ namespace Collier.Monitoring.Idle
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings.Value));
             _idleMonitor = idleMonitor ?? throw new ArgumentNullException(nameof(idleMonitor));
-            logger.LogDebug("IdleMonitorBackgroundService Created");
+            _logger.LogDebug("IdleMonitorBackgroundService Created");
         }
 
         public virtual async Task ExecuteAsync(CancellationToken stoppingToken)

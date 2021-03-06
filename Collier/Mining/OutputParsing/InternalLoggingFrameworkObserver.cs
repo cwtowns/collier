@@ -4,66 +4,72 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Collier.Mining;
+using Collier.Host;
 using Microsoft.Extensions.Logging;
 
-namespace CollierService.Mining.OutputParsing
+namespace Collier.Mining.OutputParsing
 {
     /// <summary>
     /// Handles monitoring the process output for the service's internal logging diagnostics.
     /// </summary>
-    public class InternalLoggingFrameworkObserver : IObserver<LogMessage>
+    public class InternalLoggingFrameworkObserver : IInitializationProcedure
     {
         private readonly ILogger<InternalLoggingFrameworkObserver> _logger;
         private readonly ILogger _logObserver;
-        private readonly LogLevel _level;
 
-        public InternalLoggingFrameworkObserver(ILogger<InternalLoggingFrameworkObserver> logger, ILogger logObserver, LogLevel level)
+        public InternalLoggingFrameworkObserver(ILogger<InternalLoggingFrameworkObserver> logger, ILogger<IMiner> logObserver, IMinerLogListener logListener)
         {
             _logObserver = logObserver ?? throw new ArgumentNullException((nameof(logObserver)));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _level = level;
+            logListener = logListener ?? throw new ArgumentNullException(nameof(logListener));
+
+            logListener.LogMessageReceived += ReceiveLogMessage;
         }
 
-        public virtual void OnCompleted()
+        public async Task Init()
         {
-            _logger.LogWarning("{methodName}", "OnCompleted");
+            //no-op, we wired everything up in the constructor
+            await Task.CompletedTask;
         }
 
-        public virtual void OnError(Exception error)
+#pragma warning disable 1998
+        public virtual async void ReceiveLogMessage(object sender, LogMessage message)
         {
-            _logger.LogError(error, "{methodName}", "OnError");
-        }
-
-        public virtual void OnNext(LogMessage value)
-        {
-            const string format = "yyyyMMdd HH:mm:ss";
-            string originalMessage = value.Message;
-
-            var firstPartOfString = originalMessage.Substring(0, Math.Min(17, originalMessage.Length));
-
-            if (firstPartOfString.Length != format.Length)
-            {
-                _logger.LogDebug("{methodName} {message} {length}", "ModifyLog", "Log message is not long enough", firstPartOfString.Length);
-                _logObserver.Log(_level, originalMessage);
-                return;
-            }
-
             try
             {
-                DateTime result = DateTime.ParseExact(firstPartOfString, format, CultureInfo.InvariantCulture);
-                _logger.LogDebug("{methodName} {message}", "ModifyLog", "modifying", firstPartOfString);
-                _logObserver.Log(_level, originalMessage.Substring(Math.Min(format.Length + 1, originalMessage.Length)));
-            }
-            catch (Exception)
-            {
-                _logger.LogDebug("{methodName} {message} {firstPartOfString}", "ModifyLog", "parserError", firstPartOfString);
-                _logObserver.Log(_level, originalMessage);
-            }
-        }
+                const string format = "yyyyMMdd HH:mm:ss";
+                string originalMessage = message.Message;
 
-        public IDisposable Register(IObservable<LogMessage> subject)
-        {
-            return subject.Subscribe(this);
+                var firstPartOfString = originalMessage.Substring(0, Math.Min(17, originalMessage.Length));
+
+                if (firstPartOfString.Length != format.Length)
+                {
+                    _logger.LogDebug("{methodName} {message} {length}", "ModifyLog", "Log message is not long enough",
+                        firstPartOfString.Length);
+                    _logObserver.LogInformation(originalMessage);
+                    return;
+                }
+
+                try
+                {
+                    DateTime result = DateTime.ParseExact(firstPartOfString, format, CultureInfo.InvariantCulture);
+                    _logger.LogDebug("{methodName} {message} {strippedMessage}", "ModifyLog", "modifying", firstPartOfString);
+                    _logObserver.LogInformation(originalMessage.Substring(Math.Min(format.Length + 1, originalMessage.Length)));
+                }
+                catch (Exception)
+                {
+                    _logger.LogDebug("{methodName} {message} {firstPartOfString}", "ModifyLog", "parserError",
+                        firstPartOfString);
+                    _logObserver.LogInformation(originalMessage);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "{methodName} {message} ", "ModifyLog", "unexpected error received");
+            }
+
         }
     }
+#pragma warning restore 1998
 }
