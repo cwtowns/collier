@@ -37,7 +37,7 @@ namespace Collier.Mining
 
         private readonly IMinerLogListener _listener;
 
-        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener)
+        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener, IInternalLoggingFrameworkObserver loggingFrameworkObserver)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -49,6 +49,15 @@ namespace Collier.Mining
             _settings.ExeArguments = _settings.ExeArguments ?? string.Empty;
 
             _listener = listener ?? throw new ArgumentNullException(nameof(listener));
+
+            if (loggingFrameworkObserver == null)
+                throw new ArgumentNullException(nameof(loggingFrameworkObserver));
+
+            //i dont know a better spot to do this wire up which is frustrating.  
+            //it needs to happen after all dependencies are registered and before background services start
+            //I think the only way I can ensure that is to have it execute as part of an object I know
+            //is resolved when the miner is resolved
+            _listener.LogMessageReceived += loggingFrameworkObserver.ReceiveLogMessage;
         }
 
         public void Dispose()

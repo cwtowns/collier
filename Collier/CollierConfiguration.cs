@@ -8,7 +8,6 @@ using Collier.Host;
 using Collier.IO;
 using Collier.Mining;
 using Collier.Monitoring.Gpu;
-using Collier.Monitoring.Idle;
 using Collier.Mining.OutputParsing;
 using Microsoft.Extensions.Configuration;
 
@@ -37,11 +36,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Configure<NvidiaSmiExecutor.Settings>(options => gpuMonitoring.Bind(options));
 
 
-            services.Configure<IdleMonitor.Settings>(options => monitoringSection.GetSection("userIdle").Bind(options));
-            services.Configure<IdleMonitorBackgroundService.Settings>(options => monitoringSection.GetSection("userIdle").Bind(options));
-
-
-
             //TODO why doesnt this approach work?  Make a sample project and post on stack overflow?
             //_services.AddHostedService<BackgroundServiceHelper<GpuMonitoringBackgroundService>>();
             //_services.AddHostedService<BackgroundServiceHelper<IdleMonitorBackgroundService>>();
@@ -68,8 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ITrexWebClient, TrexWebClient>();
             services.AddSingleton<IGpuMonitoringBackgroundService, Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>();
             services.AddSingleton<IGpuProcessMonitor<GpuProcessEvent>, GpuMonitorOutputParser_ProcessList>();
-            services.AddSingleton<IIdleMonitorBackgroundService, IdleMonitorBackgroundService>();
-            services.AddSingleton<IIdleMonitor, IdleMonitor>();
+
             services.AddSingleton<ProcessFactory, ProcessFactory>();
             services.AddSingleton<INvidiaSmiParser, NvidiaSmiParser>();
             services.AddSingleton<INvidiaSmiExecutor, NvidiaSmiExecutor>();
@@ -80,12 +73,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMinerProcessFactory, MinerProcessFactory>();
             services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(cancelTokenSource));
 
+            services.AddSingleton<IInternalLoggingFrameworkObserver, InternalLoggingFrameworkObserver>();
+
+            services.AddSingleton<IMiningInfoBroadcaster, ExternalLoggingFrameworkObserver>();
+            services.AddSingleton<IMiningInfoBroadcaster, HashRateLogObserver>();
+            services.AddSingleton<IMiningInfoBroadcaster, PowerLogObserver>();
+            services.AddSingleton<IMiningInfoBroadcaster, TempLogObserver>();
+
             services.AddSingleton<IMinerLogListener, MinerListener>();
 
-            services.AddSingleton<IInitializationProcedure, InternalLoggingFrameworkObserver>();
-
-            services.AddHostedService<InitService>();
             services.AddHostedService<Collier.Host.GpuMonitoringBackgroundService>();
+            services.AddHostedService<SignalRBackgroundService>();
 
             return services;
         }

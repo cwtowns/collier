@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Collier.Mining.OutputParsing
 {
-    public class TempLogObserver : IInitializationProcedure, IMiningInfoBroadcaster
+    public class TempLogObserver : IMiningInfoBroadcaster
     {
         private readonly ILogger<TempLogObserver> _logger;
         private readonly Regex _searchRegex = new Regex("GPU .* \\[T:(\\d*)C,");
@@ -36,12 +36,6 @@ namespace Collier.Mining.OutputParsing
             logListener.LogMessageReceived += ReceiveLogMessage;
             _settings = options.Value;
             _movingStatistics = new MovingStatistics(_settings.StatHistorySize);
-        }
-
-        public async Task Init()
-        {
-            //no-op, we wired everything up in the constructor
-            await Task.CompletedTask;
         }
 
 #pragma warning disable 1998

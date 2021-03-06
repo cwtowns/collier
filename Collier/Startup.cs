@@ -11,7 +11,6 @@ using Collier.IO;
 using Collier.Mining;
 using Collier.Monitoring;
 using Collier.Monitoring.Gpu;
-using Collier.Monitoring.Idle;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;

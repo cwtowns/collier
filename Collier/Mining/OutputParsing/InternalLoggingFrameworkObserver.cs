@@ -10,27 +10,23 @@ using Microsoft.Extensions.Logging;
 
 namespace Collier.Mining.OutputParsing
 {
+    public interface IInternalLoggingFrameworkObserver
+    {
+        void ReceiveLogMessage(object sender, LogMessage message);
+    }
+
     /// <summary>
     /// Handles monitoring the process output for the service's internal logging diagnostics.
     /// </summary>
-    public class InternalLoggingFrameworkObserver : IInitializationProcedure
+    public class InternalLoggingFrameworkObserver : IInternalLoggingFrameworkObserver
     {
         private readonly ILogger<InternalLoggingFrameworkObserver> _logger;
         private readonly ILogger _logObserver;
 
-        public InternalLoggingFrameworkObserver(ILogger<InternalLoggingFrameworkObserver> logger, ILogger<IMiner> logObserver, IMinerLogListener logListener)
+        public InternalLoggingFrameworkObserver(ILogger<InternalLoggingFrameworkObserver> logger, ILogger<IMiner> logObserver)
         {
             _logObserver = logObserver ?? throw new ArgumentNullException((nameof(logObserver)));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            logListener = logListener ?? throw new ArgumentNullException(nameof(logListener));
-
-            logListener.LogMessageReceived += ReceiveLogMessage;
-        }
-
-        public async Task Init()
-        {
-            //no-op, we wired everything up in the constructor
-            await Task.CompletedTask;
         }
 
 #pragma warning disable 1998

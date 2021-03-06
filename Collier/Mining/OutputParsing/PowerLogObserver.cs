@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace Collier.Mining.OutputParsing
 {
-    public class PowerLogObserver : IInitializationProcedure, IMiningInfoBroadcaster
+    public class PowerLogObserver : IMiningInfoBroadcaster
     {
         private readonly ILogger<PowerLogObserver> _logger;
         private readonly Regex _searchRegex = new Regex("GPU .* P:(\\d*)W,");
@@ -36,12 +36,6 @@ namespace Collier.Mining.OutputParsing
             logListener.LogMessageReceived += ReceiveLogMessage;
             _settings = options.Value;
             _movingStatistics = new MovingStatistics(_settings.StatHistorySize);
-        }
-
-        public async Task Init()
-        {
-            //no-op, we wired everything up in the constructor
-            await Task.CompletedTask;
         }
 
 #pragma warning disable 1998
