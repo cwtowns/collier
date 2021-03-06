@@ -11,14 +11,10 @@ using Collier.IO;
 using Collier.Mining;
 using Collier.Monitoring;
 using Collier.Monitoring.Gpu;
-using Collier.Monitoring.Idle;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
-using Collier.Host;
-using CollierService.Mining;
-using CollierService.Monitoring.Gpu;
 using Serilog;
 using GpuMonitoringBackgroundService = Collier.Monitoring.Gpu.GpuMonitoringBackgroundService;
 
@@ -59,7 +55,10 @@ namespace GrpcGreeter
                 .AddEnvironmentVariables()
                 .Build();
 
-            _services.AddGrpc();
+            //https://developer.okta.com/blog/2019/11/21/csharp-websockets-tutorial
+            _services.AddSignalRCore();
+
+            //_services.AddGrpc();
             _services.AddCollier(_configuration, _cancellationTokenSource);
 
             Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(_configuration).CreateLogger();
@@ -82,6 +81,7 @@ namespace GrpcGreeter
 
             app.UseRouting();
 
+            /*
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<GreeterService>();
@@ -91,6 +91,7 @@ namespace GrpcGreeter
                     await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
                 });
             });
+            */
         }
     }
 }

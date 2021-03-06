@@ -8,16 +8,14 @@ using Collier.Host;
 using Collier.IO;
 using Collier.Mining;
 using Collier.Monitoring.Gpu;
-using Collier.Monitoring.Idle;
-using CollierService.Mining;
-using CollierService.Monitoring.Gpu;
+using Collier.Mining.OutputParsing;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class CollierServiceCollectionExtensions
     {
-        public static string ENV_VARIABLE_COLLIER_ROOT_DIRECTORY = "COLLIER_ROOT_DIRECTORY";
+        public const string ENV_VARIABLE_COLLIER_ROOT_DIRECTORY = "COLLIER_ROOT_DIRECTORY";
 
         public static IServiceCollection AddCollier(
             this IServiceCollection services, IConfiguration config, CancellationTokenSource cancelTokenSource)
@@ -36,11 +34,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Configure<GpuMonitorOutputParser_ProcessList.Settings>(options => gpuMonitoring.GetSection("outputParsers").GetSection("processListOutputParser").Bind(options));
 
             services.Configure<NvidiaSmiExecutor.Settings>(options => gpuMonitoring.Bind(options));
-
-
-            services.Configure<IdleMonitor.Settings>(options => monitoringSection.GetSection("userIdle").Bind(options));
-            services.Configure<IdleMonitorBackgroundService.Settings>(options => monitoringSection.GetSection("userIdle").Bind(options));
-
 
 
             //TODO why doesnt this approach work?  Make a sample project and post on stack overflow?
@@ -69,19 +62,28 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ITrexWebClient, TrexWebClient>();
             services.AddSingleton<IGpuMonitoringBackgroundService, Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>();
             services.AddSingleton<IGpuProcessMonitor<GpuProcessEvent>, GpuMonitorOutputParser_ProcessList>();
-            services.AddSingleton<IIdleMonitorBackgroundService, IdleMonitorBackgroundService>();
-            services.AddSingleton<IIdleMonitor, IdleMonitor>();
+
             services.AddSingleton<ProcessFactory, ProcessFactory>();
             services.AddSingleton<INvidiaSmiParser, NvidiaSmiParser>();
             services.AddSingleton<INvidiaSmiExecutor, NvidiaSmiExecutor>();
-            services.AddSingleton<ITrexLogModifier, DateStrippingTrexLogModifier>();
             services.AddSingleton<IGpuMonitor, GpuMonitor>();
             services.AddSingleton(new HttpClient());
 
+
             services.AddSingleton<IMinerProcessFactory, MinerProcessFactory>();
-            services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(cancelTokenSource.Token));
+            services.AddSingleton<IApplicationCancellationTokenFactory>(new DefaultCancellationTokenFactory(cancelTokenSource));
+
+            services.AddSingleton<IInternalLoggingFrameworkObserver, InternalLoggingFrameworkObserver>();
+
+            services.AddSingleton<IMiningInfoBroadcaster, ExternalLoggingFrameworkObserver>();
+            services.AddSingleton<IMiningInfoBroadcaster, HashRateLogObserver>();
+            services.AddSingleton<IMiningInfoBroadcaster, PowerLogObserver>();
+            services.AddSingleton<IMiningInfoBroadcaster, TempLogObserver>();
+
+            services.AddSingleton<IMinerLogListener, MinerListener>();
 
             services.AddHostedService<Collier.Host.GpuMonitoringBackgroundService>();
+            services.AddHostedService<SignalRBackgroundService>();
 
             return services;
         }
