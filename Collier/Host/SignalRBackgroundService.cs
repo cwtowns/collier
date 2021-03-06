@@ -24,9 +24,10 @@ namespace Collier.Host
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("{methodName} {message}", "ExecuteAsync", "starting");
+
             foreach (var infoBroadcaster in _miningInfoBroadcasters)
             {
                 _logger.LogInformation("{methodName} {message}", "ExecuteAsync", "Adding event listener for " + infoBroadcaster.GetType().FullName);
@@ -34,14 +35,13 @@ namespace Collier.Host
             }
 
 
+
             //TODO unclear if this is necessary or if i can simply return.
             //I probably can as I assume the background service will persist in memory now that I've done the wire-up to the event handlers
             while (!stoppingToken.IsCancellationRequested)
             {
-                Task.Delay(500, stoppingToken);
+                await Task.Delay(int.MaxValue, stoppingToken);
             }
-
-            return Task.CompletedTask;
         }
 
 #pragma warning disable 1998
