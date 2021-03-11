@@ -13,6 +13,7 @@ namespace Collier.Monitoring.Gpu
         public class Settings
         {
             public ICollection<string> ValidGamePaths { get; set; } = new List<string>();
+            public ICollection<string> IgnoreGamePaths { get; set; } = new List<string>();
         }
 
         private readonly INvidiaSmiParser _parser;
@@ -85,7 +86,21 @@ namespace Collier.Monitoring.Gpu
 
                         if (app.Trim().StartsWith(s.Trim(), StringComparison.OrdinalIgnoreCase))
                         {
-                            _logger.LogDebug("{methodName} {message} {processPath", "GetMonitoredProcesses", "Found matching process", app);
+                            var ignore = false;
+                            foreach (var invalid in _settings.IgnoreGamePaths)
+                            {
+                                if (app.Trim().StartsWith(invalid.Trim(), StringComparison.OrdinalIgnoreCase))
+                                {
+                                    ignore = true;
+                                    _logger.LogDebug("{methodName} {message} {processPath}", "GetMonitoredProcesses", "Found matching process but it is in ignore path", app);
+                                    break;
+                                }
+                            }
+
+                            if (ignore)
+                                continue;
+
+                            _logger.LogDebug("{methodName} {message} {processPath}", "GetMonitoredProcesses", "Found matching process", app);
                             eventList.Add(app);
                         }
                     }
