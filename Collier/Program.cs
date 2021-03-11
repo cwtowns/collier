@@ -41,6 +41,9 @@ namespace GrpcGreeter
         //once I set this up I can run the dev platform with a fake process that acts like the miner so I can iterate on this
         //while still mining via my installed service
 
+        //===> 23:59:43 [Information] (Collier.Mining.IMiner) WD: ======== GPU CRASH LIST ========
+        //===> 23:59:43 [Information] (Collier.Mining.IMiner) WD: GPU#0: 1
+
         public static void Main(string[] args)
         {
             var rootDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
