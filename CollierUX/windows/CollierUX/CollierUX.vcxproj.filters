@@ -60,4 +60,10 @@
   <ItemGroup>
     <Page Include="MainPage.xaml" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\FontAwesome5_Solid.ttf" />
+    <Font Include="Assets\FontAwesome.ttf" />
+    <Font Include="Assets\FontAwesome5_Brands.ttf" />
+    <Font Include="Assets\FontAwesome5_Regular.ttf" />
+  </ItemGroup>
 </Project>

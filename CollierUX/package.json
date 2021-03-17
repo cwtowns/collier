@@ -11,12 +11,15 @@
     "windows": "react-native run-windows"
   },
   "dependencies": {
+    "@microsoft/signalr": "^5.0.4",
     "@types/jest": "^26.0.20",
     "@types/react": "^17.0.3",
     "@types/react-native": "^0.63.52",
     "@types/react-test-renderer": "^17.0.1",
     "react": "17.0.1",
     "react-native": "0.64.0",
+    "react-native-signalr": "^1.0.6",
+    "react-native-vector-icons": "^8.1.0",
     "react-native-windows": "^0.64.0-0",
     "typescript": "^4.2.3"
   },
