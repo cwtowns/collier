@@ -40,7 +40,7 @@ class HashStats extends React.PureComponent<MyProps, MyState> {
 
     render() {
         return (
-            <StatContainer unitLabel='MH/s' iconName='calculator' averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
+            <StatContainer config={AppConfig.statStates["hash"]} averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
         );
     }
 }

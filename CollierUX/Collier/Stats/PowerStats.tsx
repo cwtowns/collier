@@ -9,6 +9,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyProps, MyState } from './StatsCommon';
 import StatContainer from './StatContainer';
 
+import AppTheme from '../Theme';
+import AppConfig from '../Config';
+
 class PowerStats extends React.PureComponent<MyProps, MyState> {
     constructor(props: MyProps) {
         super(props);
@@ -37,7 +40,7 @@ class PowerStats extends React.PureComponent<MyProps, MyState> {
 
     render() {
         return (
-            <StatContainer unitLabel='Watts' iconName='bolt' averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
+            <StatContainer config={AppConfig.statStates["power"]} averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
         );
     }
 }

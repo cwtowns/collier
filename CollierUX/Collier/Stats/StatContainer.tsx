@@ -6,29 +6,78 @@ import {
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import { Statistic } from '../Config';
+
+import { Color } from "react-color";
+
 interface MyProps {
-    iconName: string,
-    unitLabel: string,
     averageValue: number,
-    lastValue: number
+    lastValue: number,
+    config: Statistic
 }
 
-const StatContainer = (props: MyProps) => {
-    return (
-        <View style={{ flexDirection: "row"}}>
-            <Icon name={props.iconName} size={50} color="yellow" style={{ margin: 5 }}/>
-            <View style={{ flex: 1, flexDirection: 'column', margin: 5, alignItems: 'stretch' }}>
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ textAlign: 'right', flex: 1 }}>Average:</Text>
-                    <Text style={{ flex: 2 }} >&nbsp;&nbsp;{props.averageValue}&nbsp;{props.unitLabel}</Text>
-                </View>
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ textAlign: 'right', flex: 1 }}>Last:</Text>
-                    <Text style={{ flex: 2 }}>&nbsp;&nbsp;{props.lastValue}&nbsp;{props.unitLabel}</Text>
+interface MyState {
+    state: StatState
+}
+
+type StatState = 'good' | 'caution' | 'danger';
+
+import AppTheme from '../Theme';
+
+class StatContainer extends React.PureComponent<MyProps, MyState> {
+    constructor(props: MyProps) {
+        super(props);
+
+        this.state = {
+            state: this.calculateStatState()
+        };
+    }
+
+    calculateStatState(): StatState {
+        if (this.props.config.direction === 'up') {
+            if (this.props.averageValue <= this.props.config.states.good)
+                return 'good';
+            else if (this.props.averageValue <= this.props.config.states.caution)
+                return 'caution';
+            return 'danger'
+        }
+
+        if (this.props.averageValue <= this.props.config.states.danger)
+            return 'danger';
+        else if (this.props.averageValue <= this.props.config.states.caution)
+            return 'caution';
+        return 'good'        
+    }
+
+    getStateColor() : Color { 
+        const state = this.calculateStatState();
+        if(state === 'good')
+            return AppTheme.statisticsState.good
+        if(state === 'caution')
+            return AppTheme.statisticsState.caution;
+        if(state === 'danger')
+            return AppTheme.statisticsState.danger;        
+     
+        throw new Error('Unsupported state:  ' + state);
+    }
+
+    render() {
+        return (
+            <View style={{ flexDirection: "row" }}>
+                <Icon name={this.props.config.icon.name} size={50} color={this.getStateColor()} style={{ margin: 5 }} />
+                <View style={{ flex: 1, flexDirection: 'column', margin: 5, alignItems: 'stretch' }}>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ textAlign: 'right', flex: 1 }}>Average:</Text>
+                        <Text style={{ flex: 2 }} >&nbsp;&nbsp;{this.props.averageValue}&nbsp;{this.props.config.unitLabel}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ textAlign: 'right', flex: 1 }}>Last:</Text>
+                        <Text style={{ flex: 2 }}>&nbsp;&nbsp;{this.props.lastValue}&nbsp;{this.props.config.unitLabel}</Text>
+                    </View>
                 </View>
             </View>
-        </View>
-    );    
+        );
+    }
 }
 
 export default StatContainer;

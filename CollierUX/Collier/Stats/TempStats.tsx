@@ -9,6 +9,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyProps, MyState } from './StatsCommon';
 import StatContainer from './StatContainer';
 
+import AppTheme from '../Theme';
+import AppConfig from '../Config';
+
+
 class TempStats extends React.PureComponent<MyProps, MyState> {
     constructor(props: MyProps) {
         super(props);
@@ -37,7 +41,7 @@ class TempStats extends React.PureComponent<MyProps, MyState> {
 
     render() {
         return (
-            <StatContainer unitLabel='C' iconName='thermometer-half' averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
+            <StatContainer config={AppConfig.statStates["temp"]} averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
         );
     }
 }

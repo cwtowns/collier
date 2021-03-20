@@ -9,6 +9,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyProps, MyState } from './StatsCommon';
 import StatContainer from './StatContainer';
 
+import AppTheme from '../Theme';
+import AppConfig from '../Config';
+
 class CrashStats extends React.PureComponent<MyProps, MyState> {
     constructor(props: MyProps) {
         super(props);
@@ -39,7 +42,7 @@ class CrashStats extends React.PureComponent<MyProps, MyState> {
 
     render() {
         return (
-            <StatContainer unitLabel='Crashes' iconName='unlink' averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
+            <StatContainer config={AppConfig.statStates["crash"]} averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
         );
     }
 }

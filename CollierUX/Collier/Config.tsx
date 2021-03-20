@@ -8,7 +8,7 @@ interface Icon {
     name: string
 }
 
-interface Statistic {
+export interface Statistic {
     icon: Icon,
     unitLabel: string,
     direction: "up" | "down",
