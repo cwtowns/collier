@@ -1,73 +1,58 @@
+//import * as React from 'react';
+
 import React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { Text, View } from 'react-native';
 
-export interface Props {
-    name: string;
-    enthusiasmLevel?: number;
-}
+import * as SignalR from "@microsoft/signalr";
+import RawLog from './Collier/RawLog';
+import StatsPanel from './Collier/Stats/StatsPanel';
+import PowerControl from './Collier/PowerControl';
 
-const Hello = (props: Props) => {
-    const [enthusiasmLevel, setEnthusiasmLevel] = React.useState(
-        props.enthusiasmLevel
-    );
+export class CollierApp extends React.PureComponent {
+  hub_endpoint: string = 'http://localhost:9999/miner';
 
-    const onIncrement = () =>
-        setEnthusiasmLevel((enthusiasmLevel || 0) + 1);
-    const onDecrement = () =>
-        setEnthusiasmLevel((enthusiasmLevel || 0) - 1);
+  connection: SignalR.HubConnection = new SignalR.HubConnectionBuilder()
+    .withUrl(this.hub_endpoint)
+    .configureLogging(SignalR.LogLevel.Debug)
+    .build();
 
-    const getExclamationMarks = (numChars: number) =>
-        Array(numChars + 1).join('!');
+  componentDidMount = () => {
+    this.connection.start().then(() => {
+      console.log(`Connected to ${this.hub_endpoint}`);
+    }).catch(err => {
+      console.log(`Error starting the connection: ${err.toString()}`)
+    });
+
+    this.connection.onclose(async () => {
+      console.log(`Disconnected from ${this.hub_endpoint}`);
+    });
+  };
+
+  render() {
     return (
-        <View style={styles.root}>
-          <Icon name="bolt" size={50} color="yellow" style={{ margin: 5 }}/>
-            <Text style={styles.greeting}>
-                Hello{' '}
-                {props.name + getExclamationMarks(enthusiasmLevel || 0)}
-            </Text>
-            <View style={styles.buttons}>
-                <View style={styles.button}>
-                    <Button
-                        title="-"
-                        onPress={onDecrement}
-                        accessibilityLabel="decrement"
-                        color="red"
-                    />
-                </View>
-                <View style={styles.button}>
-                    <Button
-                        title="+"
-                        onPress={onIncrement}
-                        accessibilityLabel="increment"
-                        color="blue"
-                    />
-                </View>
+      <View style={{margin: 10}}>
+        <View style={{flexDirection: 'row'}}>
+          <View style={{flex:1, justifyContent:'center', alignItems: 'center'}}>
+            <PowerControl></PowerControl>
+          </View>
+          <View style={{flex:9}}>
+            <StatsPanel websocket={this.connection}></StatsPanel>
             </View>
         </View>
+        <RawLog websocket={this.connection}></RawLog>
+      </View>
     );
-};
+  }
+}
 
-const styles = StyleSheet.create({
-    root: {
-        alignItems: 'center',
-        alignSelf: 'center'
-    },
-    buttons: {
-        flexDirection: 'row',
-        minHeight: 70,
-        alignItems: 'stretch',
-        alignSelf: 'center',
-        borderWidth: 5
-    },
-    button: {
-        flex: 1,
-        paddingVertical: 0
-    },
-    greeting: {
-        color: '#999',
-        fontWeight: 'bold'
-    }
-});
 
-export default Hello;
+/*
+      <View style={{ flexDirection: 'column', justifyContent: 'space-around' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around', margin: 10 }}>
+          <StatsPanel websocket={this.connection}></StatsPanel>
+        </View>
+        <RawLog websocket={this.connection}></RawLog>
+      </View>
+
+      */
+export default CollierApp;
