@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+    View,
     Text,
     ScrollView,
 } from 'react-native';
@@ -11,11 +12,14 @@ interface RawLogProps {
 }
 
 interface RawLogState {
-    logArray: string[]
+    logArray: string[],
+    performedFirstScroll: boolean
 }
 
 class RawLog extends React.PureComponent<RawLogProps, RawLogState>  {
-    maxBacklog: number = 10
+    maxBacklog: number = 100
+
+    scrollViewRef : React.RefObject<ScrollView>;
 
     constructor(props: RawLogProps) {
         super(props);
@@ -25,8 +29,11 @@ class RawLog extends React.PureComponent<RawLogProps, RawLogState>  {
         });
 
         this.state = {
-            logArray: Array(this.maxBacklog).join(' ').split(' ')
+            logArray: Array(this.maxBacklog).join(' ').split(' '),
+            performedFirstScroll: false
         };
+
+        this.scrollViewRef = React.createRef<ScrollView>();
     }
 
     updateLog(message: string) {
@@ -48,12 +55,26 @@ class RawLog extends React.PureComponent<RawLogProps, RawLogState>  {
         });
     }
 
+    checkForFirstScroll(width: number, height: number) {
+        //oddly I could not get a simple scrollToEnd in componentDidMount() to work
+        if(!this.state.performedFirstScroll) {
+            this.scrollViewRef.current?.scrollTo({y:height});
+            this.setState(() => {
+                return {
+                    performedFirstScroll: true
+                }
+            })
+        }
+    }
+
     render() {
         return (
+            <View style={{height: 120}} >
+                <ScrollView ref={this.scrollViewRef} style={{ width: "100%", backgroundColor: 'purple' }} onContentSizeChange={(width,height) => this.checkForFirstScroll(width, height)}> 
+                    {this.state.logArray.map((txt, i) => <Text key={i}>{txt}</Text>)}
+                </ScrollView>
+            </View>
 
-            <ScrollView style={{ width: "100%", backgroundColor: 'purple' }}>
-                {this.state.logArray.map((txt, i) => <Text key={i}>{txt}</Text>)}
-            </ScrollView>
         );
     }
 }

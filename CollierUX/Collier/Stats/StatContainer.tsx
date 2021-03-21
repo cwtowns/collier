@@ -2,7 +2,7 @@ import React from 'react';
 import {
     View,
     Text,
-} from 'react-native';
+} from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -46,27 +46,27 @@ class StatContainer extends React.PureComponent<MyProps, MyState> {
             return 'danger';
         else if (this.props.averageValue <= this.props.config.states.caution)
             return 'caution';
-        return 'good'        
+        return 'good'
     }
 
-    getStateColor() : Color { 
+    getStateColor(): Color {
         const state = this.calculateStatState();
-        if(state === 'good')
+        if (state === 'good')
             return AppTheme.statisticsState.good
-        if(state === 'caution')
+        if (state === 'caution')
             return AppTheme.statisticsState.caution;
-        if(state === 'danger')
-            return AppTheme.statisticsState.danger;        
-     
+        if (state === 'danger')
+            return AppTheme.statisticsState.danger;
+
         throw new Error('Unsupported state:  ' + state);
     }
 
     render() {
         return (
             <View style={{ flexDirection: "row" }}>
-                <Icon name={this.props.config.icon.name} size={50} color={this.getStateColor()} style={{ margin: 5 }} />
+                <Icon name={this.props.config.icon.name} size={50} color={this.getStateColor().toString()} style={{ margin: 5 }} />
                 <View style={{ flex: 1, flexDirection: 'column', margin: 5, alignItems: 'stretch' }}>
-                    <View style={{ flexDirection: 'row' }}>
+                    <View style={{ flexDirection: 'row', borderWidth: 1 }}>
                         <Text style={{ textAlign: 'right', flex: 1 }}>Average:</Text>
                         <Text style={{ flex: 2 }} >&nbsp;&nbsp;{this.props.averageValue}&nbsp;{this.props.config.unitLabel}</Text>
                     </View>

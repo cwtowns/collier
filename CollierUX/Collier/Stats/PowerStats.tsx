@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
-import {
-    Text,
-    View,
-} from 'react-native';
-
-import Icon from 'react-native-vector-icons/FontAwesome';
-
 import { MyProps, MyState } from './StatsCommon';
 import StatContainer from './StatContainer';
 
-import AppTheme from '../Theme';
 import AppConfig from '../Config';
 
 class PowerStats extends React.PureComponent<MyProps, MyState> {
