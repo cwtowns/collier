@@ -12,6 +12,8 @@ export interface Statistic {
     icon: Icon,
     unitLabel: string,
     direction: "up" | "down",
+    hideAverage?: boolean,
+    hideLast?: boolean,
     states: StateThresholds
 }
 
@@ -81,7 +83,8 @@ const AppConfig: CollierConfig = {
                 good: 0,  //lower bound, anything above is the next state
                 caution: 2,  //lower bound, anything above is the next state
                 danger: 3  //doesnt matter, caution will take care of it?
-            }
+            },
+            hideAverage: true
         }
     },
     rawLog: {

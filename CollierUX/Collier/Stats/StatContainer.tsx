@@ -62,18 +62,32 @@ class StatContainer extends React.PureComponent<MyProps, MyState> {
     }
 
     render() {
+        //not sure how to do this with typescript.  
+        let averageComponent;
+        let lastComponent;
+
+        if(this.props.config.hideAverage != true) {
+            averageComponent = 
+                <View style={{ flexDirection: 'row', borderWidth: 1 }}>
+                    <Text style={{ textAlign: 'right', flex: 1 }}>Average:</Text>
+                    <Text style={{ flex: 2 }} >&nbsp;&nbsp;{this.props.averageValue}&nbsp;{this.props.config.unitLabel}</Text>
+                </View>;
+        }
+
+        if(this.props.config.hideLast != true) {
+            lastComponent = 
+                <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ textAlign: 'right', flex: 1 }}>Last:</Text>
+                    <Text style={{ flex: 2 }}>&nbsp;&nbsp;{this.props.lastValue}&nbsp;{this.props.config.unitLabel}</Text>
+                </View>;
+        }
+
         return (
             <View style={{ flexDirection: "row" }}>
                 <Icon name={this.props.config.icon.name} size={50} color={this.getStateColor().toString()} style={{ margin: 5 }} />
                 <View style={{ flex: 1, flexDirection: 'column', margin: 5, alignItems: 'stretch' }}>
-                    <View style={{ flexDirection: 'row', borderWidth: 1 }}>
-                        <Text style={{ textAlign: 'right', flex: 1 }}>Average:</Text>
-                        <Text style={{ flex: 2 }} >&nbsp;&nbsp;{this.props.averageValue}&nbsp;{this.props.config.unitLabel}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ textAlign: 'right', flex: 1 }}>Last:</Text>
-                        <Text style={{ flex: 2 }}>&nbsp;&nbsp;{this.props.lastValue}&nbsp;{this.props.config.unitLabel}</Text>
-                    </View>
+                    {averageComponent}
+                    {lastComponent}
                 </View>
             </View>
         );

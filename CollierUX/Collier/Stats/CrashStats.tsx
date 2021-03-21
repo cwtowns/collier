@@ -11,31 +11,21 @@ class CrashStats extends React.PureComponent<MyProps, MyState> {
         super(props);
 
         this.state = {
-            average: 11,
-            last: 22
+            average: 0,
+            last: 0
         };
 
-        /*
-        props.websocket.on("AverageHashRate", (message) => {
-            this.setState(function (state, props) {
-                return {
-                    average: message
-                }
-            }) 
-        });
-
-        props.websocket.on("LastHashRate", (message) => {
+        
+        props.websocket.on("CurrentCrashCount", (message) => {
             this.setState(function (state, props) {
                 return {
                     last: message
                 }
-            })
+            }) 
         });
-        */
     }
     componentWillUnmount() {
-        //this.props.websocket.off("AverageHashRate");
-        //this.props.websocket.off("LastHashRate");
+        this.props.websocket.off("CurrentCrashCount");
     }
 
     render() {
