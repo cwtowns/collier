@@ -13,7 +13,7 @@ namespace Collier.Mining.OutputParsing
     public class TempLogObserver : IMiningInfoBroadcaster
     {
         private readonly ILogger<TempLogObserver> _logger;
-        private readonly Regex _searchRegex = new Regex("GPU .* \\[T:(\\d*)C,");
+        private readonly Regex _searchRegex = new Regex(@"GPU .* \[T:(\d*)C,");
         private readonly MovingStatistics _movingStatistics;
 
         public class Settings

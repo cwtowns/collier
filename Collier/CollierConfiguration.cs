@@ -78,6 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMiningInfoBroadcaster, ExternalLoggingFrameworkObserver>();
             services.AddSingleton<IMiningInfoBroadcaster, HashRateLogObserver>();
             services.AddSingleton<IMiningInfoBroadcaster, PowerLogObserver>();
+            services.AddSingleton<IMiningInfoBroadcaster, CrashCountLogObserver>();
             services.AddSingleton<IMiningInfoBroadcaster, TempLogObserver>();
 
             services.AddSingleton<IMinerLogListener, MinerListener>();
