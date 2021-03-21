@@ -5,6 +5,7 @@ import StatContainer from './StatContainer';
 import AppConfig from '../Config';
 
 class PowerStats extends React.PureComponent<MyProps, MyState> {
+
     constructor(props: MyProps) {
         super(props);
 
@@ -28,6 +29,11 @@ class PowerStats extends React.PureComponent<MyProps, MyState> {
                 }
             })
         });
+    }
+
+    componentWillUnmount() {
+        this.props.websocket.off("AveragePower");
+        this.props.websocket.off("LastPower");
     }
 
     render() {

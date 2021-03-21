@@ -6,6 +6,7 @@ import StatContainer from './StatContainer';
 import AppConfig from '../Config';
 
 class CrashStats extends React.PureComponent<MyProps, MyState> {
+
     constructor(props: MyProps) {
         super(props);
 
@@ -20,7 +21,7 @@ class CrashStats extends React.PureComponent<MyProps, MyState> {
                 return {
                     average: message
                 }
-            })
+            }) 
         });
 
         props.websocket.on("LastHashRate", (message) => {
@@ -31,6 +32,10 @@ class CrashStats extends React.PureComponent<MyProps, MyState> {
             })
         });
         */
+    }
+    componentWillUnmount() {
+        //this.props.websocket.off("AverageHashRate");
+        //this.props.websocket.off("LastHashRate");
     }
 
     render() {

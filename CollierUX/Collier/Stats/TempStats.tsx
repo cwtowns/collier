@@ -7,6 +7,7 @@ import AppConfig from '../Config';
 
 
 class TempStats extends React.PureComponent<MyProps, MyState> {
+
     constructor(props: MyProps) {
         super(props);
 
@@ -15,12 +16,12 @@ class TempStats extends React.PureComponent<MyProps, MyState> {
             last: 0
         };
 
-        props.websocket.on("AverageTemp", (message) => {
+    props.websocket.on("AverageTemp", (message) => {
             this.setState(function (state, props) {
                 return {
                     average: message
                 }
-            })
+            });
         });
 
         props.websocket.on("LastTemp", (message) => {
@@ -28,8 +29,13 @@ class TempStats extends React.PureComponent<MyProps, MyState> {
                 return {
                     last: message
                 }
-            })
+            });
         });
+    }
+
+    componentWillUnmount() {
+        this.props.websocket.off("AverageTemp");
+        this.props.websocket.off("LastTemp");
     }
 
     render() {

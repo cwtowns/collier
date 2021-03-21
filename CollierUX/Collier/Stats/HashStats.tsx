@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 
 import { MyProps, MyState } from './StatsCommon';
+import * as SignalR from "@microsoft/signalr";
 import StatContainer from './StatContainer';
 
 import AppConfig from '../Config';
 
 class HashStats extends React.PureComponent<MyProps, MyState> {
+
     constructor(props: MyProps) {
         super(props);
 
@@ -21,14 +23,19 @@ class HashStats extends React.PureComponent<MyProps, MyState> {
                 }
             });
         });
-
-        props.websocket.on("LastHashRate", (message) => {
+ 
+    props.websocket.on("LastHashRate", (message) => {
             this.setState(function (state, props) {
                 return {
                     last: message
                 }
             });
         });
+    }
+
+    componentWillUnmount() {
+        this.props.websocket.off("AverageHashRate");
+        this.props.websocket.off("LastHashRate");
     }
 
     render() {
