@@ -67,14 +67,17 @@ class RawLog extends React.PureComponent<RawLogProps, RawLogState>  {
         }
     }
 
+    componentWillUnmount() {
+        this.props.websocket.off("Log");
+    }
+
     render() {
         return (
             <View style={{height: 120}} >
-                <ScrollView ref={this.scrollViewRef} style={{ width: "100%", backgroundColor: 'purple' }} onContentSizeChange={(width,height) => this.checkForFirstScroll(width, height)}> 
+                <ScrollView ref={this.scrollViewRef} style={{ width: "100%", borderWidth: 1 }} onContentSizeChange={(width,height) => this.checkForFirstScroll(width, height)}> 
                     {this.state.logArray.map((txt, i) => <Text key={i}>{txt}</Text>)}
                 </ScrollView>
             </View>
-
         );
     }
 }

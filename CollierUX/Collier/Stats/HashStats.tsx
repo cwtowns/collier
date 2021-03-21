@@ -23,8 +23,8 @@ class HashStats extends React.PureComponent<MyProps, MyState> {
                 }
             });
         });
- 
-    props.websocket.on("LastHashRate", (message) => {
+
+        props.websocket.on("LastHashRate", (message) => {
             this.setState(function (state, props) {
                 return {
                     last: message
