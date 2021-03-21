@@ -13,7 +13,7 @@ namespace Collier.Mining.OutputParsing
     public class HashRateLogObserver : IMiningInfoBroadcaster
     {
         private readonly ILogger<HashRateLogObserver> _logger;
-        private readonly Regex _searchRegex = new Regex("GPU .* - (\\d*\\.?\\d+) MH/s,");
+        private readonly Regex _searchRegex = new Regex(@"GPU .* - (\d*\.?\d+) MH/s,");
         private readonly MovingStatistics _movingStatistics;
 
         public class Settings
