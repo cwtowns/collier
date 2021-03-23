@@ -51,6 +51,8 @@ namespace Collier.Monitoring.Gpu
                 {
                     _logger.LogInformation("{methodName} {message}", "CheckActivity",
                         "Starting mining because no processes are running.");
+                    //TODO https://stackoverflow.com/questions/22629951/suppressing-warning-cs4014-because-this-call-is-not-awaited-execution-of-the
+                    //TODO https://stackoverflow.com/questions/22864367/fire-and-forget-approach/22864616#22864616
                     _miner.Start();
                 }
                 else if (e.ActiveProcesses.Count > 0 && minerRunning)

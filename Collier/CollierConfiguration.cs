@@ -35,28 +35,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.Configure<NvidiaSmiExecutor.Settings>(options => gpuMonitoring.Bind(options));
 
-
-            //TODO why doesnt this approach work?  Make a sample project and post on stack overflow?
-            //_services.AddHostedService<BackgroundServiceHelper<GpuMonitoringBackgroundService>>();
-            //_services.AddHostedService<BackgroundServiceHelper<IdleMonitorBackgroundService>>();
-            //_services.AddHostedService<BackgroundServiceHelper<EventCoordinatorBackgroundService>>();
-            /*
-             *      //_services.AddHostedService<GpuMonitoringBackgroundService>();
-             *      //_services.AddHostedService<IdleMonitorBackgroundService>();
-             *      
-             *      If we register the _services themselves with the DI container as singletons types
-             *      and also as _services, we will not get singleton behavior.  Apparently
-             *      we have to delegate control of the sub _services to the parent service and only
-             *      add the parent service as a hosted service.  
-             *      
-             *      https://github.com/dotnet/extensions/issues/553#issuecomment-462892616
-             *      
-             *      basically says do not depend on the service itself, depend on a different abstraction
-             *      this means event Coordinator background service needs to depend on something else for GPU and Idle background service.
-             *      
-             *      //TODO remove the weirdness of how I'm doing background service injection
-             */
-
             services.AddSingleton<IMiner, TrexMiner>();
             services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_ProcessList>();
             services.AddSingleton<ITrexWebClient, TrexWebClient>();
@@ -75,11 +53,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IInternalLoggingFrameworkObserver, InternalLoggingFrameworkObserver>();
 
-            services.AddSingleton<IMiningInfoBroadcaster, ExternalLoggingFrameworkObserver>();
-            services.AddSingleton<IMiningInfoBroadcaster, HashRateLogObserver>();
-            services.AddSingleton<IMiningInfoBroadcaster, PowerLogObserver>();
-            services.AddSingleton<IMiningInfoBroadcaster, CrashCountLogObserver>();
-            services.AddSingleton<IMiningInfoBroadcaster, TempLogObserver>();
+            services.AddSingleton<IMiningInfoNotifier, ExternalLoggingFrameworkObserver>();
+            services.AddSingleton<IMiningInfoNotifier, HashRateLogObserver>();
+            services.AddSingleton<IMiningInfoNotifier, PowerLogObserver>();
+            services.AddSingleton<IMiningInfoNotifier, CrashCountLogObserver>();
+            services.AddSingleton<IMiningInfoNotifier, TempLogObserver>();
+
+            services.AddSingleton<MinerStateNotifier>();
+            services.AddSingleton<IMiningInfoNotifier>(x => x.GetRequiredService<MinerStateNotifier>());
 
             services.AddSingleton<IMinerLogListener, MinerListener>();
 

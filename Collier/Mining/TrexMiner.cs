@@ -15,8 +15,6 @@ namespace Collier.Mining
     //to check status and see if I am mining, the hashrate property will be 0 or non zero.
     public class TrexMiner : IMiner, IDisposable
     {
-        public event EventHandler<MiningInformation> MiningInformationChanged;
-
         public class Settings
         {
             public Settings()
@@ -38,9 +36,10 @@ namespace Collier.Mining
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
 
         private readonly IMinerLogListener _listener;
-        private readonly string _eventName = "MiningState";
 
-        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener, IInternalLoggingFrameworkObserver loggingFrameworkObserver)
+        private MinerStateNotifier _minerStateNotifier;
+
+        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener, IInternalLoggingFrameworkObserver loggingFrameworkObserver, MinerStateNotifier minerStateNotifier)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -52,6 +51,8 @@ namespace Collier.Mining
             _settings.ExeArguments = _settings.ExeArguments ?? string.Empty;
 
             _listener = listener ?? throw new ArgumentNullException(nameof(listener));
+
+            _minerStateNotifier = minerStateNotifier ?? throw new ArgumentNullException(nameof(minerStateNotifier));
 
             loggingFrameworkObserver = loggingFrameworkObserver ?? throw new ArgumentNullException(nameof(loggingFrameworkObserver));
 
@@ -76,7 +77,7 @@ namespace Collier.Mining
             }
             finally
             {
-                MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Stopped.ToString() });
+                Notify(IMiner.MiningState.Stopped);
                 _lock.Release();
             }
             GC.SuppressFinalize(this);
@@ -99,12 +100,12 @@ namespace Collier.Mining
 
                 if (!process.HasExited)
                 {
-                    MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Running.ToString() });
+                    Notify(IMiner.MiningState.Running);
                     return true;
                 }
 
                 result = await _webClient.IsMiningAsync();
-                MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = result ? IMiner.MiningState.Running.ToString() : IMiner.MiningState.Paused.ToString() });
+                Notify(IMiner.MiningState.Running);
                 return result;
             }
             finally
@@ -122,7 +123,7 @@ namespace Collier.Mining
 
                 if (process == null || process.HasExited)
                 {
-                    MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Stopped.ToString() });
+                    Notify(IMiner.MiningState.Stopped);
 
                     _logger.LogInformation("{methodName} {message}", "Start", "Spawning new process because old process " + (process == null ? "is null." : "has exited."));
 
@@ -135,7 +136,7 @@ namespace Collier.Mining
                     };
 
                     process.Start();
-                    MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Unknown.ToString() });
+                    Notify(IMiner.MiningState.Unknown);
                     process.BeginOutputReadLine();
                     _logger.LogInformation("{methodName} {message}", "Start", "process started, waiting for success status");
 
@@ -145,7 +146,7 @@ namespace Collier.Mining
 
                         if (isRunning)
                         {
-                            MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Running.ToString() });
+                            Notify(IMiner.MiningState.Running);
                             _logger.LogInformation("{methodName} {message}", "Start", "Miner has completed starting.");
                             return;
                         }
@@ -174,11 +175,11 @@ namespace Collier.Mining
 
                     if (await _webClient.IsMiningAsync())
                     {
-                        MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Running.ToString() });
+                        Notify(IMiner.MiningState.Running);
                     }
                     else
                     {
-                        MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Paused.ToString() });
+                        Notify(IMiner.MiningState.Paused);
                         _logger.LogInformation("{methodName} {message}", "Start",
                             "Process has not exited and it might be paused, asking existing process to resume.");
                         await _webClient.ResumeAsync();
@@ -201,20 +202,26 @@ namespace Collier.Mining
 
                 if (process == null || process.HasExited)
                 {
-                    MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Stopped.ToString() });
+                    Notify(IMiner.MiningState.Stopped);
                     _logger.LogDebug("{methodName} {message}", "Stop", "Process has already exited.");
                     return Task.CompletedTask;
                 }
 
                 _logger.LogInformation("{methodName} {message}", "Stop", "Killing full process tree.");
                 process.Kill(true);
-                MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = _eventName, Value = IMiner.MiningState.Stopped.ToString() });
+                Notify(IMiner.MiningState.Stopped);
             }
             finally
             {
                 _lock.Release();
             }
             return Task.CompletedTask;
+        }
+
+        private void Notify(IMiner.MiningState state)
+        {
+            _minerStateNotifier.CurrentState = state;
+            _minerStateNotifier.Notify();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Collier.Mining
 {
-    public interface IMiner : IMiningInfoBroadcaster
+    public interface IMiner
     {
         Task Stop();
         Task Start();

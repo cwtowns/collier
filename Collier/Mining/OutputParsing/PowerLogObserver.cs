@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace Collier.Mining.OutputParsing
 {
-    public class PowerLogObserver : IMiningInfoBroadcaster
+    public class PowerLogObserver : IMiningInfoNotifier
     {
         private readonly ILogger<PowerLogObserver> _logger;
         private readonly Regex _searchRegex = new Regex(@"GPU .* P:(\d*)W,");
@@ -51,7 +51,7 @@ namespace Collier.Mining.OutputParsing
                 {
                     LastPower = power;
                     _movingStatistics.Push(power);
-                    Broadcast();
+                    Notify();
                 }
                 else
                     _logger.LogWarning("{methodName} {message}", "ReceiveLogMessage", "Unable to parse calculated value " + match.Groups[0].Value);
@@ -63,7 +63,7 @@ namespace Collier.Mining.OutputParsing
         }
 #pragma warning restore 1998
 
-        private void Broadcast()
+        public void Notify()
         {
             var miningInformation = new MiningInformation() { Name = "AveragePower", Value = AveragePower.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);

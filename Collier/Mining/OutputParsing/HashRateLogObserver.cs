@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace Collier.Mining.OutputParsing
 {
-    public class HashRateLogObserver : IMiningInfoBroadcaster
+    public class HashRateLogObserver : IMiningInfoNotifier
     {
         private readonly ILogger<HashRateLogObserver> _logger;
         private readonly Regex _searchRegex = new Regex(@"GPU .* - (\d*\.?\d+) MH/s,");
@@ -51,7 +51,7 @@ namespace Collier.Mining.OutputParsing
                 {
                     LastHashRate = hashRate;
                     _movingStatistics.Push(hashRate);
-                    Broadcast();
+                    Notify();
                 }
                 else
                     _logger.LogWarning("{methodName} {message}", "ReceiveLogMessage", "Unable to parse calculated value " + match.Groups[0].Value);
@@ -63,7 +63,7 @@ namespace Collier.Mining.OutputParsing
         }
 #pragma warning restore 1998
 
-        private void Broadcast()
+        public virtual void Notify()
         {
             var miningInformation = new MiningInformation() { Name = "AverageHashRate", Value = AverageHashRate.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);

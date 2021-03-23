@@ -16,7 +16,7 @@ class TempStats extends React.PureComponent<MyProps, MyState> {
             last: 0
         };
 
-    props.websocket.on("AverageTemp", (message) => {
+        props.websocket.on("AverageTemp", (message) => {
             this.setState(function (state, props) {
                 return {
                     average: message

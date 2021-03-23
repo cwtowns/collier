@@ -28,11 +28,12 @@ namespace CollierTests.Mining
             var factory = new Mock<IMinerProcessFactory>();
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
+            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Stopped.ToString();
             };
@@ -51,11 +52,12 @@ namespace CollierTests.Mining
             var factory = new Mock<IMinerProcessFactory>();
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
+            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Stopped.ToString();
             };
@@ -76,14 +78,15 @@ namespace CollierTests.Mining
             var process = new Mock<IProcess>();
             process.Setup(x => x.HasExited).Returns(false);
             factory.Setup(x => x.CurrentProcess).Returns(process.Object);
+            var notifier = new MinerStateNotifier();
 
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Stopped.ToString();
             };
@@ -107,11 +110,12 @@ namespace CollierTests.Mining
 
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
+            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Running.ToString();
             };
@@ -131,6 +135,8 @@ namespace CollierTests.Mining
             var settings = new TrexMiner.Settings();
             var factory = new Mock<IMinerProcessFactory>();
 
+            var notifier = new MinerStateNotifier();
+
             var process = new Mock<IProcess>();
             process.Setup(x => x.HasExited).Returns(true);
             factory.Setup(x => x.CurrentProcess).Returns(process.Object);
@@ -138,10 +144,10 @@ namespace CollierTests.Mining
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Running.ToString();
             };
@@ -168,10 +174,11 @@ namespace CollierTests.Mining
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var notifier = new MinerStateNotifier();
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Running.ToString();
             };
@@ -199,10 +206,11 @@ namespace CollierTests.Mining
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var notifier = new MinerStateNotifier();
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Running.ToString();
             };
@@ -229,11 +237,12 @@ namespace CollierTests.Mining
 
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
+            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
             var statePassed = false;
 
-            miner.MiningInformationChanged += (o, e) =>
+            notifier.MiningInformationChanged += (o, e) =>
             {
                 statePassed = e.Value == IMiner.MiningState.Paused.ToString();
             };

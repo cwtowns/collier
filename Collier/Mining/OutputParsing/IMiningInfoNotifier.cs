@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace Collier.Mining.OutputParsing
 {
-    public interface IMiningInfoBroadcaster
+    public interface IMiningInfoNotifier
     {
         event EventHandler<MiningInformation> MiningInformationChanged;
+        void Notify();
     }
 
     public class MiningInformation

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Collier.Mining.OutputParsing
 {
-    public class ExternalLoggingFrameworkObserver : IMiningInfoBroadcaster
+    public class ExternalLoggingFrameworkObserver : IMiningInfoNotifier
     {
         public event EventHandler<MiningInformation> MiningInformationChanged;
 
@@ -23,5 +23,10 @@ namespace Collier.Mining.OutputParsing
             MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = "Log", Value = message.Message });
         }
 #pragma warning restore 1998
+
+        public virtual void Notify()
+        {
+            //no-op for now, maybe this tracks and keeps some log information for the future (last 10 lines or so)
+        }
     }
 }
