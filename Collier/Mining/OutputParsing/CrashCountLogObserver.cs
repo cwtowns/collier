@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace Collier.Mining.OutputParsing
 {
-    public class CrashCountLogObserver : IMiningInfoBroadcaster
+    public class CrashCountLogObserver : IMiningInfoNotifier
     {
         private readonly Regex _searchRegex = new Regex(@"WD: GPU#\d*: (\d*)");
         private readonly string _crashIdentifier = "GPU CRASH LIST";
@@ -36,7 +36,7 @@ namespace Collier.Mining.OutputParsing
                 {
                     isNextMessageCrashCount = false;
                     CrashCount = 0;
-                    Broadcast();
+                    Notify();
                     return;
                 }
 
@@ -57,7 +57,7 @@ namespace Collier.Mining.OutputParsing
                         if (crashCountFromLog != CrashCount)
                         {
                             CrashCount = crashCountFromLog;
-                            Broadcast();
+                            Notify();
                         }
                     }
                     else
@@ -75,7 +75,7 @@ namespace Collier.Mining.OutputParsing
         }
 #pragma warning restore 1998
 
-        private void Broadcast()
+        public virtual void Notify()
         {
             var miningInformation = new MiningInformation() { Name = "CurrentCrashCount", Value = CrashCount.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);

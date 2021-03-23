@@ -62,9 +62,9 @@ class StatContainer extends React.PureComponent<MyProps, MyState> {
     }
 
     render() {
-        //not sure how to do this with typescript.  
-        let averageComponent;
-        let lastComponent;
+        //TODO not sure how to do this with typescript.  
+        let averageComponent : {};
+        let lastComponent: {};
 
         if(this.props.config.hideAverage != true) {
             averageComponent = 

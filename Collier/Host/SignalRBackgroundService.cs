@@ -13,11 +13,11 @@ namespace Collier.Host
 {
     public class SignalRBackgroundService : BackgroundService
     {
-        private readonly IEnumerable<IMiningInfoBroadcaster> _miningInfoBroadcasters;
+        private readonly IEnumerable<IMiningInfoNotifier> _miningInfoBroadcasters;
         private readonly IHubContext<CollierHub> _hubContext;
         private readonly ILogger<SignalRBackgroundService> _logger;
 
-        public SignalRBackgroundService(ILogger<SignalRBackgroundService> logger, IHubContext<CollierHub> hubContext, IEnumerable<IMiningInfoBroadcaster> miningInfoBroadcasters)
+        public SignalRBackgroundService(ILogger<SignalRBackgroundService> logger, IHubContext<CollierHub> hubContext, IEnumerable<IMiningInfoNotifier> miningInfoBroadcasters)
         {
             _miningInfoBroadcasters =
                 miningInfoBroadcasters ?? throw new ArgumentNullException(nameof(miningInfoBroadcasters));

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Collier.Mining.OutputParsing
 {
-    public class TempLogObserver : IMiningInfoBroadcaster
+    public class TempLogObserver : IMiningInfoNotifier
     {
         private readonly ILogger<TempLogObserver> _logger;
         private readonly Regex _searchRegex = new Regex(@"GPU .* \[T:(\d*)C,");
@@ -51,7 +51,7 @@ namespace Collier.Mining.OutputParsing
                 {
                     LastTemp = temp;
                     _movingStatistics.Push(temp);
-                    Broadcast();
+                    Notify();
                 }
                 else
                     _logger.LogWarning("{methodName} {message}", "ReceiveLogMessage", "Unable to parse calculated value " + match.Groups[0].Value);
@@ -63,7 +63,7 @@ namespace Collier.Mining.OutputParsing
         }
 #pragma warning restore 1998
 
-        private void Broadcast()
+        public virtual void Notify()
         {
             var miningInformation = new MiningInformation() { Name = "AverageTemp", Value = AverageTemp.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);
