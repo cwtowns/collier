@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -20,37 +20,31 @@ interface MyState {
     state: StatState
 }
 
+//TODO I want the state type restrictions i think
 type StatState = 'good' | 'caution' | 'danger';
 
 import AppTheme from '../Theme';
 
-class StatContainer extends React.PureComponent<MyProps, MyState> {
-    constructor(props: MyProps) {
-        super(props);
+const StatContainer = (props: MyProps) => {
 
-        this.state = {
-            state: this.calculateStatState()
-        };
-    }
-
-    calculateStatState(): StatState {
-        if (this.props.config.direction === 'up') {
-            if (this.props.averageValue <= this.props.config.states.good)
+    const calculateStatState = (): StatState => {
+        if (props.config.direction === 'up') {
+            if (props.averageValue <= props.config.states.good)
                 return 'good';
-            else if (this.props.averageValue <= this.props.config.states.caution)
+            else if (props.averageValue <= props.config.states.caution)
                 return 'caution';
             return 'danger'
         }
 
-        if (this.props.averageValue <= this.props.config.states.danger)
+        if (props.averageValue <= props.config.states.danger)
             return 'danger';
-        else if (this.props.averageValue <= this.props.config.states.caution)
+        else if (props.averageValue <= props.config.states.caution)
             return 'caution';
         return 'good'
-    }
+    };
 
-    getStateColor(): Color {
-        const state = this.calculateStatState();
+    const getStateColor = (): Color => {
+        const state = calculateStatState();
         if (state === 'good')
             return AppTheme.statisticsState.good
         if (state === 'caution')
@@ -61,37 +55,41 @@ class StatContainer extends React.PureComponent<MyProps, MyState> {
         throw new Error('Unsupported state:  ' + state);
     }
 
-    render() {
-        //TODO not sure how to do this with typescript.  
-        let averageComponent : {};
-        let lastComponent: {};
+    const [state, setState] = useState(calculateStatState());
 
-        if(this.props.config.hideAverage != true) {
-            averageComponent = 
-                <View style={{ flexDirection: 'row', borderWidth: 1 }}>
-                    <Text style={{ textAlign: 'right', flex: 1 }}>Average:</Text>
-                    <Text style={{ flex: 2 }} >&nbsp;&nbsp;{this.props.averageValue}&nbsp;{this.props.config.unitLabel}</Text>
-                </View>;
-        }
+    //TODO not sure how to do this with typescript.  
+    let averageComponent: {};
+    let lastComponent: {};
 
-        if(this.props.config.hideLast != true) {
-            lastComponent = 
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ textAlign: 'right', flex: 1 }}>Last:</Text>
-                    <Text style={{ flex: 2 }}>&nbsp;&nbsp;{this.props.lastValue}&nbsp;{this.props.config.unitLabel}</Text>
-                </View>;
-        }
-
-        return (
-            <View style={{ flexDirection: "row" }}>
-                <Icon name={this.props.config.icon.name} size={50} color={this.getStateColor().toString()} style={{ margin: 5 }} />
-                <View style={{ flex: 1, flexDirection: 'column', margin: 5, alignItems: 'stretch' }}>
-                    {averageComponent}
-                    {lastComponent}
-                </View>
-            </View>
-        );
+    if (props.config.hideAverage != true) {
+        averageComponent =
+            <View style={{ flexDirection: 'row', borderWidth: 1 }}>
+                <Text style={{ textAlign: 'right', flex: 1 }}>Average:</Text>
+                <Text style={{ flex: 2 }} >&nbsp;&nbsp;{props.averageValue}&nbsp;{props.config.unitLabel}</Text>
+            </View>;
     }
+    else
+        averageComponent = <View></View>
+
+    if (props.config.hideLast != true) {
+        lastComponent =
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ textAlign: 'right', flex: 1 }}>Last:</Text>
+                <Text style={{ flex: 2 }}>&nbsp;&nbsp;{props.lastValue}&nbsp;{props.config.unitLabel}</Text>
+            </View>;
+    }
+    else
+        lastComponent = <View></View>
+
+    return (
+        <View style={{ flexDirection: "row" }}>
+            <Icon name={props.config.icon.name} size={50} color={getStateColor().toString()} style={{ margin: 5 }} />
+            <View style={{ flex: 1, flexDirection: 'column', margin: 5, alignItems: 'stretch' }}>
+                {averageComponent}
+                {lastComponent}
+            </View>
+        </View>
+    );
 }
 
 export default StatContainer;

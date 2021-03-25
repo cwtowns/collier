@@ -1,38 +1,26 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { MyProps, MyState } from './StatsCommon';
+import { MyProps } from './StatsCommon';
 import StatContainer from './StatContainer';
 
 import AppConfig from '../Config';
 
-class CrashStats extends React.PureComponent<MyProps, MyState> {
+const CrashStats = (props: MyProps) => {
+    const [last, setLast] = useState(0);
 
-    constructor(props: MyProps) {
-        super(props);
-
-        this.state = {
-            average: 0,
-            last: 0
-        };
-
-        
+    useEffect(() => {
         props.websocket.on("CurrentCrashCount", (message) => {
-            this.setState(function (state, props) {
-                return {
-                    last: message
-                }
-            }) 
+            setLast(message);
         });
-    }
-    componentWillUnmount() {
-        this.props.websocket.off("CurrentCrashCount");
-    }
 
-    render() {
-        return (
-            <StatContainer config={AppConfig.statStates["crash"]} averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
-        );
-    }
+        return () => {
+            props.websocket.off("CurrentCrashCount");
+        }
+    });
+
+    return (
+        <StatContainer config={AppConfig.statStates["crash"]} averageValue={0} lastValue={last}></StatContainer>
+    );
 }
 
 export default CrashStats;

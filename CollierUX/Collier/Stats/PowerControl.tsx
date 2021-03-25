@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -9,45 +9,36 @@ import AppTheme from '../Theme';
 import { Color } from "react-color";
 
 interface MyState {
-    state: 'Unknown' | 'Running' |  'Stopped' |  'Paused'
+    state: 'Unknown' | 'Running' | 'Stopped' | 'Paused'
 }
 
-class PowerControl extends React.Component<MyProps, MyState> {
-    
-    constructor(props) {
-        super(props);
-        
-        this.state = {
-            state: 'Unknown'
-        };
+const PowerControl = (props: MyProps) => {
+    const [state, setState] = useState('Unknown');
 
+    //TODO I want the state interface enforced here
+
+    useEffect(() => {
         props.websocket.on("MiningState", (message) => {
-            this.setState(function (state, props) {
-                return {
-                    state: message
-                }
-            })
+            setState(message);
         });
-    }
 
-    getStateColor(): Color {            
-        if (this.state.state === 'Running')
+        return () => {
+            props.websocket.off("MiningState");
+        }
+    });
+
+    const getStateColor = (): Color => {
+        if (state === 'Running')
             return AppTheme.miningState.mining;
-        if (this.state.state === 'Stopped' || this.state.state === 'Paused')
+        if (state === 'Stopped' || state === 'Paused')
             return AppTheme.miningState.paused;
 
         return AppTheme.miningState.unknown;
     }
 
-    componentWillUnmount() {
-        this.props.websocket.off("MiningState");
-    }
-
-    render() {
-        return (
-            <Icon name="power-off" size={90} color={this.getStateColor().toString()} />
-        );
-    }
+    return (
+        <Icon name="power-off" size={90} color={getStateColor().toString()} />
+    );
 
 }
 
