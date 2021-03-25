@@ -1,46 +1,32 @@
-import React, { Component } from 'react';
-import { MyProps, MyState } from './StatsCommon';
+import React, { useState, useEffect } from 'react';
+import { MyProps } from './StatsCommon';
 import StatContainer from './StatContainer';
 
 import AppConfig from '../Config';
 
-class PowerStats extends React.PureComponent<MyProps, MyState> {
+const PowerStats = (props: MyProps) => {
+    const [average, setAverage] = useState(0);
+    const [last, setLast] = useState(0);
 
-    constructor(props: MyProps) {
-        super(props);
-
-        this.state = {
-            average: 0,
-            last: 0
-        };
-
+    useEffect(() => {
         props.websocket.on("AveragePower", (message) => {
-            this.setState(function (state, props) {
-                return {
-                    average: message
-                }
-            })
+            setAverage(message);
         });
 
         props.websocket.on("LastPower", (message) => {
-            this.setState(function (state, props) {
-                return {
-                    last: message
-                }
-            })
+            setLast(message);
         });
-    }
 
-    componentWillUnmount() {
-        this.props.websocket.off("AveragePower");
-        this.props.websocket.off("LastPower");
-    }
+        return () => {
+            props.websocket.off("AveragePower");
+            props.websocket.off("LastPower");
+        }
+    });
 
-    render() {
-        return (
-            <StatContainer config={AppConfig.statStates["power"]} averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
-        );
-    }
+    return (
+        <StatContainer config={AppConfig.statStates["power"]} averageValue={average} lastValue={last}></StatContainer>
+    );
+
 }
 
 export default PowerStats;

@@ -14,19 +14,19 @@ interface StatisticsStateColors {
 
 interface Theme {
     statisticsState: StatisticsStateColors,
-    miningState : MiningStateColors
+    miningState: MiningStateColors
 }
 
 const AppTheme: Theme = {
-    statisticsState : {
-        good : "green",        
+    statisticsState: {
+        good: "green",
         caution: "yellow",
-        danger : "red"
+        danger: "red"
     },
-    miningState : {
-        mining : "green",    
-        paused : "red",
-        unknown : "purple"
+    miningState: {
+        mining: "green",
+        paused: "red",
+        unknown: "purple"
     }
 };
 

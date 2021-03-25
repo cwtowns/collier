@@ -1,48 +1,32 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { MyProps, MyState } from './StatsCommon';
-import * as SignalR from "@microsoft/signalr";
+import { MyProps } from './StatsCommon';
 import StatContainer from './StatContainer';
 
 import AppConfig from '../Config';
 
-class HashStats extends React.PureComponent<MyProps, MyState> {
+const HashStats = (props: MyProps) => {
+    const [average, setAverage] = useState(0);
+    const [last, setLast] = useState(0);
 
-    constructor(props: MyProps) {
-        super(props);
-
-        this.state = {
-            average: 0,
-            last: 0
-        };
-
+    useEffect(() => {
         props.websocket.on("AverageHashRate", (message) => {
-            this.setState(function (state, props) {
-                return {
-                    average: parseFloat(parseFloat(message).toFixed(2))
-                }
-            });
+            setAverage(parseFloat(parseFloat(message).toFixed(2)));
         });
 
         props.websocket.on("LastHashRate", (message) => {
-            this.setState(function (state, props) {
-                return {
-                    last: message
-                }
-            });
+            setLast(message);
         });
-    }
 
-    componentWillUnmount() {
-        this.props.websocket.off("AverageHashRate");
-        this.props.websocket.off("LastHashRate");
-    }
+        return () => {
+            props.websocket.off("AverageHashRate");
+            props.websocket.off("LastHashRate");
+        }
+    });
 
-    render() {
-        return (
-            <StatContainer config={AppConfig.statStates["hash"]} averageValue={this.state.average} lastValue={this.state.last}></StatContainer>
-        );
-    }
+    return (
+        <StatContainer config={AppConfig.statStates["hash"]} averageValue={average} lastValue={last}></StatContainer>
+    );
 }
 
 export default HashStats;
