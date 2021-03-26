@@ -45,7 +45,7 @@ const RawLog = (props: RawLogProps) => {
     };
 
     const checkForFirstScroll = (width: number, height: number) => {
-        //oddly I could not get a simple scrollToEnd in componentDidMount() to work
+        //oddly I could not get a simple scrollToEnd in useEffect() to work
         if (performedFirstScroll === false) {
             scrollViewRef.current?.scrollTo({ y: height });
             setPerformedFirstScroll(true);
@@ -53,8 +53,9 @@ const RawLog = (props: RawLogProps) => {
     };
 
     return (
-        <View style={{ height: 120 }} >
-            <ScrollView ref={scrollViewRef} style={{ width: "100%", borderWidth: 1 }} onContentSizeChange={(width, height) => checkForFirstScroll(width, height)}>
+        <View style={{ height: 150, paddingTop: 10 }} >
+            <ScrollView ref={scrollViewRef} style={{ width: "100%", margin: 5 }} 
+                onContentSizeChange={(width, height) => checkForFirstScroll(width, height)}>
                 {logArray.map((txt, i) => <Text key={i}>{txt}</Text>)}
             </ScrollView>
         </View>

@@ -44,8 +44,8 @@ const CollierApp = () => {
   });
 
   return (
-    <View style={{ margin: 10 }}>
-      <View style={{ flexDirection: 'row' }}>
+    <View style={{ marginBottom: 10, marginLeft: 10, marginRight: 10 }}>
+      <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: "grey"}}>
         <View style={{ flex: 3, justifyContent: 'center', alignItems: 'center' }}>
           <PowerControl websocket={connection}></PowerControl>
         </View>

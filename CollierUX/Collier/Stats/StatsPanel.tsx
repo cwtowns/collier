@@ -12,12 +12,12 @@ import CrashStats from './CrashStats';
 
 const StatsPanel = (props: MyProps) => {
     return (
-        <View style={{ margin: 5, flexDirection: "row" }}>
-            <View style={{ flex: 1, margin: 10, alignSelf: "stretch" }}>
+        <View style={{ flexDirection: "row" }}>
+            <View style={{ flex: 1, alignSelf: "stretch" }}>
                 <PowerStats websocket={props.websocket}></PowerStats>
                 <TempStats websocket={props.websocket}></TempStats>
             </View>
-            <View style={{ flex: 1, margin: 10, alignSelf: "stretch", alignItems: "stretch" }}>
+            <View style={{ flex: 1, alignSelf: "stretch", alignItems: "stretch" }}>
                 <HashStats websocket={props.websocket}></HashStats>
                 <CrashStats websocket={props.websocket}></CrashStats>
             </View>

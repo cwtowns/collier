@@ -12,6 +12,8 @@ using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Navigation;
 using namespace Windows::ApplicationModel;
+using namespace winrt::Windows::UI::ViewManagement;
+using namespace winrt::Windows::Foundation;
 
 /// <summary>
 /// Initializes the singleton application object.  This is the first line of
@@ -21,26 +23,26 @@ using namespace Windows::ApplicationModel;
 App::App() noexcept
 {
 #if BUNDLE
-    JavaScriptBundleFile(L"index.windows");
-    InstanceSettings().UseWebDebugger(false);
-    InstanceSettings().UseFastRefresh(false);
+	JavaScriptBundleFile(L"index.windows");
+	InstanceSettings().UseWebDebugger(false);
+	InstanceSettings().UseFastRefresh(false);
 #else
-    JavaScriptBundleFile(L"index");
-    InstanceSettings().UseWebDebugger(true);
-    InstanceSettings().UseFastRefresh(true);
+	JavaScriptBundleFile(L"index");
+	InstanceSettings().UseWebDebugger(true);
+	InstanceSettings().UseFastRefresh(true);
 #endif
 
 #if _DEBUG
-    InstanceSettings().UseDeveloperSupport(true);
+	InstanceSettings().UseDeveloperSupport(true);
 #else
-    InstanceSettings().UseDeveloperSupport(false);
+	InstanceSettings().UseDeveloperSupport(false);
 #endif
 
-    RegisterAutolinkedNativeModulePackages(PackageProviders()); // Includes any autolinked modules
+	RegisterAutolinkedNativeModulePackages(PackageProviders()); // Includes any autolinked modules
 
-    PackageProviders().Append(make<ReactPackageProvider>()); // Includes all modules in this project
+	PackageProviders().Append(make<ReactPackageProvider>()); // Includes all modules in this project
 
-    InitializeComponent();
+	InitializeComponent();
 }
 
 /// <summary>
@@ -50,10 +52,15 @@ App::App() noexcept
 /// <param name="e">Details about the launch request and process.</param>
 void App::OnLaunched(activation::LaunchActivatedEventArgs const& e)
 {
-    super::OnLaunched(e);
+	super::OnLaunched(e);
 
-    Frame rootFrame = Window::Current().Content().as<Frame>();
-    rootFrame.Navigate(xaml_typename<CollierUX::MainPage>(), box_value(e.Arguments()));
+	auto appView = ApplicationView::GetForCurrentView();
+	appView.SetPreferredMinSize(Size(860, 310));
+	ApplicationView::PreferredLaunchViewSize(Size(860, 310));
+	ApplicationView::PreferredLaunchWindowingMode(ApplicationViewWindowingMode::PreferredLaunchViewSize);
+
+	Frame rootFrame = Window::Current().Content().as<Frame>();
+	rootFrame.Navigate(xaml_typename<CollierUX::MainPage>(), box_value(e.Arguments()));
 }
 
 /// <summary>
@@ -65,7 +72,7 @@ void App::OnLaunched(activation::LaunchActivatedEventArgs const& e)
 /// <param name="e">Details about the suspend request.</param>
 void App::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] SuspendingEventArgs const& e)
 {
-    // Save application state and stop any background activity
+	// Save application state and stop any background activity
 }
 
 /// <summary>
@@ -75,5 +82,5 @@ void App::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unus
 /// <param name="e">Details about the navigation failure</param>
 void App::OnNavigationFailed(IInspectable const&, NavigationFailedEventArgs const& e)
 {
-    throw hresult_error(E_FAIL, hstring(L"Failed to load Page ") + e.SourcePageType().Name);
+	throw hresult_error(E_FAIL, hstring(L"Failed to load Page ") + e.SourcePageType().Name);
 }
