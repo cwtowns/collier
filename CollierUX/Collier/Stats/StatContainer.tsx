@@ -10,11 +10,6 @@ interface MyProps {
   config: Statistic;
 }
 
-interface MyState {
-  state: StatState;
-}
-
-//TODO I want the state type restrictions i think
 type StatState = 'good' | 'caution' | 'danger';
 
 import AppTheme from '../Theme';
