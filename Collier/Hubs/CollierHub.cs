@@ -39,6 +39,8 @@ namespace Collier.Hubs
 
         public override async Task OnConnectedAsync()
         {
+            await Clients.Caller.Connected();
+
             await Task.Run(() =>
             {
                 foreach (var i in _miningInfoNotifiers)

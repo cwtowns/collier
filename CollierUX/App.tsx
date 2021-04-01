@@ -47,10 +47,10 @@ const CollierApp = () => {
             if (webSocket.state != SignalR.HubConnectionState.Disconnected) {
                 console.info(`websocket already in a connected state ${webSocket.state}.  Aborting connect request.`);
 
-                if (webSocket.state != SignalR.HubConnectionState.Connected)
-                    reconnect();
-                return;
-            }
+        if (webSocket.state != SignalR.HubConnectionState.Connected)
+          reconnect();
+        return;
+      }
 
             webSocket
                 .start()

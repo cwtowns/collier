@@ -10,16 +10,33 @@ const PowerControl = (props: MyProps) => {
   let [state, setState] = useState('Unknown' as PowerState);
 
     useEffect(() => {
-        props.websocket.onclose(() => {
-            setState('Stopped');    
+        //unfortunately we have to track mounted state here.  SignalR does not allow us to unregister our 
+        //handlers and the websocket might fire events after the component is unmounted
+        console.log("MiningStateControl useEffect start");
+        let mounted: boolean = true;
+
+        webSocket.onreconnected(() => {
+            console.log("MiningStateControl onreconnected " + mounted);
+            if (mounted)
+                setState('Running');
         });
 
-        props.websocket.onreconnecting(() => {
-            setState('Unknown');    
+        webSocket.onclose(() => {
+            console.log("MiningStateControl onclose " + mounted);
+            if (mounted)
+                setState('Stopped');
         });
-        
-        props.websocket.on("MiningState", (message) => {
-            setState(message);
+
+        webSocket.onreconnecting(() => {
+            console.log("MiningStateControl onreconnecting " + mounted);
+            if (mounted)
+                setState('Unknown');
+        });
+
+        webSocket.on("Connected", () => {
+            console.log("MiningStateControl connected " + mounted);
+            if (mounted)
+                setState('Running');
         });
 
     return () => {
