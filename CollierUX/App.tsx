@@ -22,7 +22,7 @@ import PowerControl from './Collier/Stats/PowerControl';
 //  9. power button clickable client side instead of starting / stopping service?  
 
 const CollierApp = () => {
-  const hub_endpoint: string = 'http://localhost:9999/miner';
+  const hub_endpoint: string = 'http://localhost:9999/miner'; //TODO externalize to config
 
   const connection: SignalR.HubConnection = new SignalR.HubConnectionBuilder()
     .withUrl(hub_endpoint)

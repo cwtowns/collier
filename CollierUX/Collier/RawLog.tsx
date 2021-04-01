@@ -30,11 +30,9 @@ const RawLog = (props: RawLogProps) => {
     });
 
     const updateLog = (message: string) => {
-        const backlog = maxBacklog;  //TODO how do I avoid this?
+        let newLog : string[];
 
-        let newLog;
-
-        if (logArray.length < backlog) {
+        if (logArray.length < maxBacklog) {
             newLog = logArray.concat(message);
         }
         else {
