@@ -9,10 +9,18 @@ type PowerState = 'Unknown' | 'Running' | 'Stopped' | 'Paused';
 const PowerControl = (props: MyProps) => {
   let [state, setState] = useState('Unknown' as PowerState);
 
-  useEffect(() => {
-    props.websocket.on('MiningState', message => {
-      setState(message);
-    });
+    useEffect(() => {
+        props.websocket.onclose(() => {
+            setState('Stopped');    
+        });
+
+        props.websocket.onreconnecting(() => {
+            setState('Unknown');    
+        });
+        
+        props.websocket.on("MiningState", (message) => {
+            setState(message);
+        });
 
     return () => {
       props.websocket.off('MiningState');
@@ -33,4 +41,4 @@ const PowerControl = (props: MyProps) => {
   return <Icon name="power-off" size={90} color={getStateColor().toString()} />;
 };
 
-export default PowerControl;
+export default MiningStateControl;
