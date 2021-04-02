@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+
+import { Pressable, GestureResponderEvent } from 'react-native';
+
+import { Button } from 'react-native-elements';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyProps } from './StatsCommon';
 import AppTheme from '../Theme';
@@ -42,8 +47,28 @@ const PowerControl = (props: MyProps) => {
       return AppTheme.miningState.paused;
     }
 
-    return AppTheme.miningState.unknown;
-  };
+        return AppTheme.miningState.unknown;
+    }
+
+    const pressHandler = (e: GestureResponderEvent) => {
+        console.log("press");
+    };
+
+    const pressInHandler = (e: GestureResponderEvent) => {
+        console.log("press in ");
+    };
+
+    return (
+        <Button type="clear"
+            icon={
+                <Icon
+                name="power-off"
+                size={90}
+                color={getStateColor().toString()}
+                />
+            }
+        />
+    );
 
   return <Icon name="power-off" size={90} color={getStateColor().toString()} />;
 };
