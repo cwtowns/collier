@@ -1,5 +1,6 @@
-import * as SignalR from '@microsoft/signalr';
+
+import { CollierHubConnection } from '../HubConnection'
 
 export interface MyProps {
-  websocket: SignalR.HubConnection;
+    websocket: CollierHubConnection
 }

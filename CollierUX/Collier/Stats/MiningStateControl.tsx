@@ -10,39 +10,29 @@ const PowerControl = (props: MyProps) => {
   let [state, setState] = useState('Unknown' as PowerState);
 
     useEffect(() => {
-        //unfortunately we have to track mounted state here.  SignalR does not allow us to unregister our 
-        //handlers and the websocket might fire events after the component is unmounted
-        console.log("MiningStateControl useEffect start");
-        let mounted: boolean = true;
+        const reconnected = () => { setState('Running'); };
+        const close = () => { setState('Stopped'); };
+        const reconnecting = () => { setState('Unknown'); }; 
 
-        webSocket.onreconnected(() => {
-            console.log("MiningStateControl onreconnected " + mounted);
-            if (mounted)
-                setState('Running');
-        });
+        webSocket.onreconnected(reconnected);
+        webSocket.onclose(close);
+        webSocket.onreconnecting(reconnecting);
+        webSocket.on("Connected", reconnected);
 
-        webSocket.onclose(() => {
-            console.log("MiningStateControl onclose " + mounted);
-            if (mounted)
-                setState('Stopped');
-        });
+        if (webSocket.state === SignalR.HubConnectionState.Connected)
+            setState('Running');
+        else if (webSocket.state === SignalR.HubConnectionState.Disconnected)
+            setState('Stopped');
+        else
+            setState('Unknown');
 
-        webSocket.onreconnecting(() => {
-            console.log("MiningStateControl onreconnecting " + mounted);
-            if (mounted)
-                setState('Unknown');
-        });
-
-        webSocket.on("Connected", () => {
-            console.log("MiningStateControl connected " + mounted);
-            if (mounted)
-                setState('Running');
-        });
-
-    return () => {
-      props.websocket.off('MiningState');
-    };
-  });
+        return () => {
+            webSocket.off("Connected");
+            webSocket.removeOnReconnected(reconnected);
+            webSocket.removeOnClose(close);
+            webSocket.removeOnReconnecting(reconnecting);
+        };
+    });
 
   const getStateColor = (): Color => {
     if (state === 'Running') {
