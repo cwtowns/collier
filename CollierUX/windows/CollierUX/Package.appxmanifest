@@ -7,14 +7,14 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="ea269762-21a7-40d5-af94-5917f6915466"
+    Name="4a17bf37-6529-49ce-9766-08ae29130a83"
     Publisher="CN=hodge"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="ea269762-21a7-40d5-af94-5917f6915466" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="4a17bf37-6529-49ce-9766-08ae29130a83" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>CollierUX</DisplayName>
+    <DisplayName>collierux</DisplayName>
     <PublisherDisplayName>hodge</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -31,12 +31,12 @@
     <Application
       Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="CollierUX.App">
+      EntryPoint="collierux.App">
       <uap:VisualElements
-        DisplayName="CollierUX"
+        DisplayName="collierux"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="CollierUX"
+        Description="collierux"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
