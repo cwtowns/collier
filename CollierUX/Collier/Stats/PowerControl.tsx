@@ -8,14 +8,10 @@ import AppTheme from '../Theme';
 
 import { Color } from "react-color";
 
-interface MyState {
-    state: 'Unknown' | 'Running' | 'Stopped' | 'Paused'
-}
+type PowerState = 'Unknown' | 'Running' | 'Stopped' | 'Paused';
 
 const PowerControl = (props: MyProps) => {
-    const [state, setState] = useState('Unknown');
-
-    //TODO I want the state interface enforced here
+    let [state, setState] = useState('Unknown' as PowerState);
 
     useEffect(() => {
         props.websocket.on("MiningState", (message) => {
