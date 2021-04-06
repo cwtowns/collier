@@ -1,5 +1,5 @@
-import * as SignalR from "@microsoft/signalr";
+import * as SignalR from '@microsoft/signalr';
 
 export interface MyProps {
-    websocket: SignalR.HubConnection
+  websocket: SignalR.HubConnection;
 }

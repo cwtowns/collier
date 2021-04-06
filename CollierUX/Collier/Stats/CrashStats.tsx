@@ -6,21 +6,25 @@ import StatContainer from './StatContainer';
 import AppConfig from '../Config';
 
 const CrashStats = (props: MyProps) => {
-    const [last, setLast] = useState(0);
+  const [last, setLast] = useState(0);
 
-    useEffect(() => {
-        props.websocket.on("CurrentCrashCount", (message) => {
-            setLast(message);
-        });
-
-        return () => {
-            props.websocket.off("CurrentCrashCount");
-        }
+  useEffect(() => {
+    props.websocket.on('CurrentCrashCount', message => {
+      setLast(message);
     });
 
-    return (
-        <StatContainer config={AppConfig.statStates["crash"]} averageValue={0} lastValue={last}></StatContainer>
-    );
-}
+    return () => {
+      props.websocket.off('CurrentCrashCount');
+    };
+  });
+
+  return (
+    <StatContainer
+      config={AppConfig.statStates.crash}
+      averageValue={0}
+      lastValue={last}
+    />
+  );
+};
 
 export default CrashStats;
