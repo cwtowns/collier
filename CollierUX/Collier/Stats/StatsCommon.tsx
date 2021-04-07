@@ -1,6 +1,5 @@
-
-import { CollierHubConnection } from '../HubConnection'
+import { CollierHubConnection } from '../HubConnection';
 
 export interface MyProps {
-    websocket: CollierHubConnection
+  websocket: CollierHubConnection;
 }
