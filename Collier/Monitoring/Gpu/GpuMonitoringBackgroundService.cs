@@ -43,6 +43,9 @@ namespace Collier.Monitoring.Gpu
         {
             try
             {
+                //i think i need to track if the UX has manually paused, and if it has and we get a trigger to start, do nothing.
+                //we may also need to reset this state if the client completely disconnects?  not sure on that 
+                //no, keep it paused i guess
                 ProcessEventTriggered?.Invoke(o, e);
 
                 var minerRunning = await _miner.IsRunningAsync();
