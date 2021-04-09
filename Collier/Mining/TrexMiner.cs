@@ -220,8 +220,11 @@ namespace Collier.Mining
 
         private void Notify(IMiner.MiningState state)
         {
-            _minerStateNotifier.CurrentState = state;
-            _minerStateNotifier.Notify();
+            if (_minerStateNotifier.CurrentState != state)
+            {
+                _minerStateNotifier.CurrentState = state;
+                _minerStateNotifier.Notify();
+            }
         }
     }
 }
