@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Collier.Host;
 using Collier.Mining;
 using Collier.Mining.OutputParsing;
+using Collier.Mining.State;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Collier.Hubs
@@ -24,12 +25,12 @@ namespace Collier.Hubs
 
         public void StopMiner()
         {
-            _miner.Stop();
+            _miner.TransitionToStateAsync(new MinerStoppedFromUserRequest());
         }
 
         public void StartMiner()
         {
-            _miner.Start();
+            _miner.TransitionToStateAsync(new MinerStartedFromUserRequest());
         }
 
         public void Shutdown()

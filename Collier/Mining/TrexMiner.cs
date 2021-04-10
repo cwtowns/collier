@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Collier.Mining;
 using Collier.Mining.OutputParsing;
+using Collier.Mining.State;
 
 namespace Collier.Mining
 {
@@ -37,9 +38,11 @@ namespace Collier.Mining
 
         private readonly IMinerLogListener _listener;
 
-        private MinerStateNotifier _minerStateNotifier;
+        public virtual IMinerStateHandler StateHandler { get; private set; }
 
-        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener, IInternalLoggingFrameworkObserver loggingFrameworkObserver, MinerStateNotifier minerStateNotifier)
+        public IMinerState CurrentState { get; set; }
+
+        public TrexMiner(ILogger<TrexMiner> logger, IOptions<Settings> settings, ITrexWebClient webClient, IMinerProcessFactory processFactory, IMinerLogListener listener, IInternalLoggingFrameworkObserver loggingFrameworkObserver)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
@@ -52,8 +55,6 @@ namespace Collier.Mining
 
             _listener = listener ?? throw new ArgumentNullException(nameof(listener));
 
-            _minerStateNotifier = minerStateNotifier ?? throw new ArgumentNullException(nameof(minerStateNotifier));
-
             loggingFrameworkObserver = loggingFrameworkObserver ?? throw new ArgumentNullException(nameof(loggingFrameworkObserver));
 
             //i dont know a better spot to do this wire up which is frustrating.  
@@ -61,6 +62,9 @@ namespace Collier.Mining
             //I think the only way I can ensure that is to have it execute as part of an object I know
             //is resolved when the miner is resolved
             _listener.LogMessageReceived += loggingFrameworkObserver.ReceiveLogMessage;
+
+            StateHandler = new MinerStateHandler(this);
+            StateHandler.TransitionToStateAsync(new UnknownMinerState());
         }
 
         public void Dispose()
@@ -77,7 +81,6 @@ namespace Collier.Mining
             }
             finally
             {
-                Notify(IMiner.MiningState.Stopped);
                 _lock.Release();
             }
             GC.SuppressFinalize(this);
@@ -100,12 +103,10 @@ namespace Collier.Mining
 
                 if (!process.HasExited)
                 {
-                    Notify(IMiner.MiningState.Running);
                     return true;
                 }
 
                 result = await _webClient.IsMiningAsync();
-                Notify(IMiner.MiningState.Running);
                 return result;
             }
             finally
@@ -123,8 +124,6 @@ namespace Collier.Mining
 
                 if (process == null || process.HasExited)
                 {
-                    Notify(IMiner.MiningState.Stopped);
-
                     _logger.LogInformation("{methodName} {message}", "Start", "Spawning new process because old process " + (process == null ? "is null." : "has exited."));
 
                     process = await _processFactory.GetNewOrExistingProcessAsync();
@@ -136,7 +135,6 @@ namespace Collier.Mining
                     };
 
                     process.Start();
-                    Notify(IMiner.MiningState.Unknown);
                     process.BeginOutputReadLine();
                     _logger.LogInformation("{methodName} {message}", "Start", "process started, waiting for success status");
 
@@ -146,7 +144,6 @@ namespace Collier.Mining
 
                         if (isRunning)
                         {
-                            Notify(IMiner.MiningState.Running);
                             _logger.LogInformation("{methodName} {message}", "Start", "Miner has completed starting.");
                             return;
                         }
@@ -173,13 +170,10 @@ namespace Collier.Mining
                         return;
                     }
 
-                    if (await _webClient.IsMiningAsync())
+                    var running = await _webClient.IsMiningAsync();
+
+                    if (!running)
                     {
-                        Notify(IMiner.MiningState.Running);
-                    }
-                    else
-                    {
-                        Notify(IMiner.MiningState.Paused);
                         _logger.LogInformation("{methodName} {message}", "Start",
                             "Process has not exited and it might be paused, asking existing process to resume.");
                         await _webClient.ResumeAsync();
@@ -202,14 +196,12 @@ namespace Collier.Mining
 
                 if (process == null || process.HasExited)
                 {
-                    Notify(IMiner.MiningState.Stopped);
                     _logger.LogDebug("{methodName} {message}", "Stop", "Process has already exited.");
                     return Task.CompletedTask;
                 }
 
                 _logger.LogInformation("{methodName} {message}", "Stop", "Killing full process tree.");
                 process.Kill(true);
-                Notify(IMiner.MiningState.Stopped);
             }
             finally
             {
@@ -218,13 +210,57 @@ namespace Collier.Mining
             return Task.CompletedTask;
         }
 
-        private void Notify(IMiner.MiningState state)
+        public async Task<bool> TransitionToStateAsync(IMinerState state)
         {
-            if (_minerStateNotifier.CurrentState != state)
+            return await StateHandler.TransitionToStateAsync(state);
+        }
+
+        public class MinerStateHandler : IMinerStateHandler
+        {
+            private IMiner _miner;
+
+            public MinerStateHandler(IMiner miner)
             {
-                _minerStateNotifier.CurrentState = state;
-                _minerStateNotifier.Notify();
+                _miner = miner ?? throw new ArgumentNullException(nameof(miner));
+            }
+
+            public event EventHandler<MiningInformation> MiningInformationChanged;
+
+            public virtual void Notify()
+            {
+                MiningInformationChanged?.Invoke(this, new MiningInformation() { Name = "MiningState", Value = _miner.CurrentState.StateName });
+            }
+
+            public virtual async Task<bool> TransitionToStateAsync(IMinerState state)
+            {
+                if (state == null)
+                    throw new ArgumentNullException(nameof(state));
+
+                if (state.Equals(_miner.CurrentState))
+                    return false;
+
+                var originalState = _miner.CurrentState;
+
+                await state.EnterStateAsync(_miner);
+
+                if (_miner.CurrentState.Equals(state))
+                {
+                    Notify();
+                    return true;
+                }
+
+                if (!_miner.CurrentState.Equals(originalState))
+                {
+                    Notify();  //not sure about this 
+                }
+
+                return false;
             }
         }
+    }
+
+    public interface IMinerStateHandler : IMiningInfoNotifier
+    {
+        Task<bool> TransitionToStateAsync(IMinerState state);
     }
 }

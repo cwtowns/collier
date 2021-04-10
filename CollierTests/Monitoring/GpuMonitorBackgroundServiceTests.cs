@@ -9,33 +9,12 @@ using System.Text;
 using System.Threading;
 using Collier.Mining;
 using Xunit;
+using Collier.Mining.State;
 
 namespace CollierTests.Monitoring
 {
     public class GpuMonitorBackgroundServiceTests
     {
-        [Fact]
-        public async void StartingTheServiceStartsTheMiner()
-        {
-            var monitor = new Mock<IGpuMonitor>();
-            monitor.Setup(x => x.IsGpuUnderLoadAsync()).ReturnsAsync(false);
-            var minerMock = new Mock<IMiner>();
-
-            var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
-
-            var backgroundService = new GpuMonitoringBackgroundService(
-                new Mock<ILogger<GpuMonitoringBackgroundService>>().Object,
-                Options.Create(settings), minerMock.Object,
-                new Mock<INvidiaSmiExecutor>().Object, new Mock<IGpuProcessMonitor<GpuProcessEvent>>().Object);
-
-            var source = new CancellationTokenSource();
-            source.Cancel();
-            await backgroundService.ExecuteAsync(source.Token);
-
-
-            minerMock.Verify(x => x.Start(), Times.AtLeastOnce, "miner should start when the background monitoring service starts to avoid rogue background processes.");
-        }
-
         [Fact]
         public async void EventShouldHaveNoProcessesWhenNoneAreRunning()
         {
@@ -78,12 +57,10 @@ namespace CollierTests.Monitoring
 
             GpuProcessEvent capturedEvent = null;
             var action = new Action<object, GpuProcessEvent>((o, e) => { capturedEvent = e; });
-            var eventHandlerDelegate = new System.EventHandler<GpuProcessEvent>(action);
-            backgroundService.ProcessEventTriggered += eventHandlerDelegate;
 
             await backgroundService.DoTaskWork();
 
-            capturedEvent.ActiveProcesses.Count.Should().Be(0, "because no processes match the watch list.");
+            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStartedFromNoGaming>()), Times.Once, "no processes match the list so we should start mining.");
         }
 
         [Fact]
@@ -128,12 +105,10 @@ namespace CollierTests.Monitoring
 
             GpuProcessEvent capturedEvent = null;
             var action = new Action<object, GpuProcessEvent>((o, e) => { capturedEvent = e; });
-            var eventHandlerDelegate = new System.EventHandler<GpuProcessEvent>(action);
-            backgroundService.ProcessEventTriggered += eventHandlerDelegate;
 
             await backgroundService.DoTaskWork();
 
-            capturedEvent.ActiveProcesses.Count.Should().Be(2, "because we said two processes were running in the watch list.");
+            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStoppedFromGaming>()), Times.Once, "two processes match the list so we should stop mining.");
         }
 
         [Fact]
@@ -160,8 +135,9 @@ namespace CollierTests.Monitoring
                 executor.Object, outputProcessor);
 
             backgroundService.CheckActivity(this, new GpuProcessEvent(new List<string>() { "some gaming process" }));
+            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStoppedFromGaming>()), Times.Once, "a process event with gaming content should stop mining");
 
-            minerMock.Verify(x => x.Stop(), Times.AtLeastOnce, "a process event with content should stop gaming.");
+            //minerMock.Verify(x => x.Stop(), Times.AtLeastOnce, "a process event with content should stop gaming.");
         }
 
         [Fact]
@@ -188,7 +164,7 @@ namespace CollierTests.Monitoring
 
             backgroundService.CheckActivity(this, new GpuProcessEvent(new List<string>()));
 
-            minerMock.Verify(x => x.Start(), Times.AtLeastOnce, "a process event with content should stop gaming.");
+            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStartedFromNoGaming>()), Times.Once, "a process gaming information should start mining.");
         }
     }
 

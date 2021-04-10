@@ -1,5 +1,4 @@
-﻿using Collier.Mining.OutputParsing;
-using System;
+﻿using Collier.Mining.State;
 using System.Threading.Tasks;
 
 namespace Collier.Mining
@@ -8,8 +7,11 @@ namespace Collier.Mining
     {
         Task Stop();
         Task Start();
+
         Task<bool> IsRunningAsync();
 
-        enum MiningState { Unknown, Running, Stopped, Paused };
+        Task<bool> TransitionToStateAsync(IMinerState state);
+
+        IMinerState CurrentState { get; set; }
     }
 }

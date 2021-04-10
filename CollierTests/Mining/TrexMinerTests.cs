@@ -23,9 +23,8 @@ namespace CollierTests.Mining
             var factory = new Mock<IMinerProcessFactory>();
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
-            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             await miner.IsRunningAsync();
 
@@ -48,9 +47,8 @@ namespace CollierTests.Mining
 
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
-            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             miner.Dispose();
 
@@ -72,9 +70,8 @@ namespace CollierTests.Mining
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
             factory.Setup(x => x.GetNewOrExistingProcessAsync()).ReturnsAsync(process.Object);
-            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             await miner.Start();
             await miner.IsRunningAsync();
@@ -110,9 +107,8 @@ namespace CollierTests.Mining
 
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
-            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             await miner.Start();
             await miner.Stop();
@@ -152,9 +148,8 @@ namespace CollierTests.Mining
 
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
-            var notifier = new MinerStateNotifier();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             await miner.Start();
             await miner.Start();
@@ -194,8 +189,7 @@ namespace CollierTests.Mining
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
-            var notifier = new MinerStateNotifier();
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             await miner.Start();
             await miner.Start();
@@ -239,12 +233,10 @@ namespace CollierTests.Mining
             });
             process.Setup(x => x.HasExited).Returns(false);
 
-
-            var notifier = new MinerStateNotifier();
             var mockLogListener = new Mock<IMinerLogListener>();
             var mockLogObserver = new Mock<IInternalLoggingFrameworkObserver>();
 
-            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object, notifier);
+            var miner = new TrexMiner(logger.Object, Options.Create(settings), mockWebClient.Object, factory.Object, mockLogListener.Object, mockLogObserver.Object);
 
             await miner.Start();
 
