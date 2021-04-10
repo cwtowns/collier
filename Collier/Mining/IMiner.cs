@@ -10,8 +10,8 @@ namespace Collier.Mining
 
         Task<bool> IsRunningAsync();
 
-        Task<bool> TransitionToStateAsync(IMinerState state);
-
         IMinerState CurrentState { get; set; }
+
+        IMinerStateHandler StateHandler { get; }
     }
 }

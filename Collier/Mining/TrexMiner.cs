@@ -251,7 +251,9 @@ namespace Collier.Mining
 
                 if (!_miner.CurrentState.Equals(originalState))
                 {
-                    Notify();  //not sure about this 
+                    //not sure about this.  we could potentially want to transition to a different state than the one
+                    //requested.  if state does change, we should notify. 
+                    Notify();
                 }
 
                 return false;

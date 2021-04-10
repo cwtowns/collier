@@ -212,5 +212,26 @@ namespace CollierTests.Mining
             eventVerification().Should().Be(false, "we should not be notified if state transition failed.");
         }
 
+        [Fact]
+        public async void StateTransitionDoesNotHappenWhenThereIsNoChange()
+        {
+            var mockMiner = new Mock<IMiner>();
+
+            mockMiner.SetupProperty(x => x.CurrentState);
+
+            var firstState = new MinerStartedFromNoGaming();
+            mockMiner.Object.CurrentState = firstState;
+
+            var stateHandler = new TrexMiner.MinerStateHandler(mockMiner.Object);
+            var newState = new MinerStartedFromNoGaming();
+            var eventVerification = AddVerifyableEventHandler(stateHandler);
+            var stateTransitionSuccess = await stateHandler.TransitionToStateAsync(newState);
+
+            stateTransitionSuccess.Should().Be(false, "We should not transition state when we are already in that state.");
+            mockMiner.Verify(x => x.Start(), Times.Never);
+            mockMiner.Object.CurrentState.Should().Be(firstState);
+            eventVerification().Should().Be(false, "we should not be notified if state transition failed.");
+        }
+
     }
 }
