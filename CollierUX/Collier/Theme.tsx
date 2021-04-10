@@ -13,9 +13,15 @@ interface StatisticsStateColors {
   danger: Color;
 }
 
+interface MiningPowerButtonColors {
+  pauseRequested: Color;
+  startRequested: Color;
+}
+
 interface Theme {
   statisticsState: StatisticsStateColors;
   miningState: MiningStateColors;
+  powerButtonState: MiningPowerButtonColors;
 }
 
 const AppTheme: Theme = {
@@ -29,6 +35,10 @@ const AppTheme: Theme = {
     paused: 'yellow',
     stopped: 'red',
     unknown: 'purple',
+  },
+  powerButtonState: {
+    pauseRequested: 'palegoldenrod',
+    startRequested: 'darkseagreen',
   },
 };
 
