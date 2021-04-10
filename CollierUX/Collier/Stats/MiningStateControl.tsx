@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
-//import { GestureResponderEvent } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
 import { Button } from 'react-native-elements';
 
@@ -8,41 +6,47 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyProps } from './StatsCommon';
 import AppTheme from '../Theme';
 import { Color } from 'react-color';
+import { GestureResponderEvent } from 'react-native';
 
-type PowerState = 'Unknown' | 'Running' | 'Stopped' | 'Paused';
+type MiningState = 'Unknown' | 'Running' | 'Stopped' | 'UserPaused';
 
 const MiningStateControl = (props: MyProps) => {
-  let [state, setState] = useState('Unknown' as PowerState);
+  let [state, setState] = useState('Unknown' as MiningState);
 
   useEffect(() => {
-    const reconnected = () => {
-      setState('Running');
-    };
     const close = () => {
-      setState('Stopped');
+      setState('Unknown');
     };
+
     const reconnecting = () => {
       setState('Unknown');
     };
 
-    props.websocket.onreconnected(reconnected);
+    const miningStateChanged = (miningState: MiningState) => {
+      console.log(`miningStateChanged ${miningState}`);
+      if (miningState === 'Running') {
+        setState('Running');
+      } else if (miningState === 'UserPaused') {
+        setState('UserPaused');
+      } else if (miningState === 'Stopped') {
+        setState('Stopped');
+      } else {
+        setState('Unknown');
+      }
+    };
+
     props.websocket.onclose(close);
     props.websocket.onreconnecting(reconnecting);
-    props.websocket.on('Connected', reconnected);
+    props.websocket.on('MiningState', miningStateChanged);
 
-    if (props.websocket.state === SignalR.HubConnectionState.Connected) {
-      setState('Running');
-    } else if (
-      props.websocket.state === SignalR.HubConnectionState.Disconnected
-    ) {
-      setState('Stopped');
-    } else {
+    if (props.websocket.state !== SignalR.HubConnectionState.Connected) {
       setState('Unknown');
+    } else {
+      props.websocket.invoke('SendMinerState');
     }
 
     return () => {
-      props.websocket.off('Connected');
-      props.websocket.removeOnReconnected(reconnected);
+      props.websocket.off('MiningState');
       props.websocket.removeOnClose(close);
       props.websocket.removeOnReconnecting(reconnecting);
     };
@@ -52,22 +56,23 @@ const MiningStateControl = (props: MyProps) => {
     if (state === 'Running') {
       return AppTheme.miningState.mining;
     }
-    if (state === 'Stopped' || state === 'Paused') {
+    if (state === 'UserPaused') {
       return AppTheme.miningState.paused;
+    }
+    if (state === 'Stopped') {
+      return AppTheme.miningState.stopped;
     }
 
     return AppTheme.miningState.unknown;
   };
 
-  /*
-  const pressHandler = (e: GestureResponderEvent) => {
-    console.log('press');
+  const pressHandler = (_e: GestureResponderEvent) => {
+    if (state === 'Running') {
+      props.websocket.invoke('StopMiner');
+    } else if (state === 'UserPaused') {
+      props.websocket.invoke('StartMiner');
+    }
   };
-
-  const pressInHandler = (e: GestureResponderEvent) => {
-    console.log('press in ');
-  };
-  */
 
   return (
     <Button
@@ -75,6 +80,7 @@ const MiningStateControl = (props: MyProps) => {
       icon={
         <Icon name="power-off" size={90} color={getStateColor().toString()} />
       }
+      onPress={pressHandler}
     />
   );
 };

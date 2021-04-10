@@ -3,6 +3,7 @@ import { Color } from 'react-color';
 interface MiningStateColors {
   mining: Color;
   paused: Color;
+  stopped: Color;
   unknown: Color;
 }
 
@@ -25,7 +26,8 @@ const AppTheme: Theme = {
   },
   miningState: {
     mining: 'green',
-    paused: 'red',
+    paused: 'yellow',
+    stopped: 'red',
     unknown: 'purple',
   },
 };

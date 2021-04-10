@@ -71,7 +71,7 @@ const CollierApp = () => {
       webSocket
         .start()
         .then(() => {
-          console.log(`Connected to ${hub_endpoint}`);
+          console.log(`Connected to ${hub_endpoint}`); 
         })
         .catch(err => {
           console.log(`Error starting the connection: ${err.toString()}`);
