@@ -18,8 +18,10 @@ namespace CollierTests.Monitoring
         [Fact]
         public async void EventShouldHaveNoProcessesWhenNoneAreRunning()
         {
+            var stateHandler = new Mock<IMinerStateHandler>();
             var monitor = new Mock<IGpuMonitor>();
             var minerMock = new Mock<IMiner>();
+            minerMock.SetupGet(x => x.StateHandler).Returns(stateHandler.Object);
             monitor.Setup(x => x.IsGpuUnderLoadAsync()).ReturnsAsync(true);
 
             var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
@@ -60,15 +62,17 @@ namespace CollierTests.Monitoring
 
             await backgroundService.DoTaskWork();
 
-            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStartedFromNoGaming>()), Times.Once, "no processes match the list so we should start mining.");
+            stateHandler.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStartedFromNoGaming>()), Times.Once, "no processes match the list so we should start mining.");
         }
 
         [Fact]
         public async void NotificationSentWhenProcessesArePresent()
         {
+            var stateHandler = new Mock<IMinerStateHandler>();
             var monitor = new Mock<IGpuMonitor>();
             var minerMock = new Mock<IMiner>();
             monitor.Setup(x => x.IsGpuUnderLoadAsync()).ReturnsAsync(true);
+            minerMock.SetupGet(x => x.StateHandler).Returns(stateHandler.Object);
 
             var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
 
@@ -108,16 +112,18 @@ namespace CollierTests.Monitoring
 
             await backgroundService.DoTaskWork();
 
-            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStoppedFromGaming>()), Times.Once, "two processes match the list so we should stop mining.");
+            stateHandler.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStoppedFromGaming>()), Times.Once, "two processes match the list so we should stop mining.");
         }
 
         [Fact]
         public void ProcessEventWithProcessesShouldStopMining()
         {
+            var stateHandler = new Mock<IMinerStateHandler>();
             var minerMock = new Mock<IMiner>();
             var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
             var parser = new NvidiaSmiParser();
 
+            minerMock.SetupGet(x => x.StateHandler).Returns(stateHandler.Object);
             minerMock.Setup(x => x.IsRunningAsync()).ReturnsAsync(true);
 
             var outputParserSettings = new GpuMonitorOutputParser_ProcessList.Settings();
@@ -135,17 +141,17 @@ namespace CollierTests.Monitoring
                 executor.Object, outputProcessor);
 
             backgroundService.CheckActivity(this, new GpuProcessEvent(new List<string>() { "some gaming process" }));
-            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStoppedFromGaming>()), Times.Once, "a process event with gaming content should stop mining");
-
-            //minerMock.Verify(x => x.Stop(), Times.AtLeastOnce, "a process event with content should stop gaming.");
+            stateHandler.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStoppedFromGaming>()), Times.Once, "a process event with gaming content should stop mining");
         }
 
         [Fact]
         public void ProcessEventWithNoProcessesShouldStartMining()
         {
+            var stateHandler = new Mock<IMinerStateHandler>();
             var minerMock = new Mock<IMiner>();
             var settings = new GpuMonitoringBackgroundService.Settings() { PollingIntervalInSeconds = 1 };
             var parser = new NvidiaSmiParser();
+            minerMock.SetupGet(x => x.StateHandler).Returns(stateHandler.Object);
 
 
             var outputParserSettings = new GpuMonitorOutputParser_ProcessList.Settings();
@@ -164,7 +170,7 @@ namespace CollierTests.Monitoring
 
             backgroundService.CheckActivity(this, new GpuProcessEvent(new List<string>()));
 
-            minerMock.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStartedFromNoGaming>()), Times.Once, "a process gaming information should start mining.");
+            stateHandler.Verify(x => x.TransitionToStateAsync(It.IsAny<MinerStartedFromNoGaming>()), Times.Once, "a process gaming information should start mining.");
         }
     }
 

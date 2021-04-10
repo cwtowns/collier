@@ -25,17 +25,17 @@ namespace Collier.Hubs
 
         public void StopMiner()
         {
-            _miner.TransitionToStateAsync(new MinerStoppedFromUserRequest());
+            _miner.StateHandler.TransitionToStateAsync(new MinerStoppedFromUserRequest());
         }
 
         public void StartMiner()
         {
-            _miner.TransitionToStateAsync(new MinerStartedFromUserRequest());
+            _miner.StateHandler.TransitionToStateAsync(new MinerStartedFromUserRequest());
         }
 
-        public void Shutdown()
+        public void SendMinerState()
         {
-            _cancellationTokenFactory.GetCancellationSource().Cancel();
+            _miner.StateHandler.Notify();
         }
 
         public override async Task OnConnectedAsync()

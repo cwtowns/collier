@@ -59,7 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMiningInfoNotifier, CrashCountLogObserver>();
             services.AddSingleton<IMiningInfoNotifier, TempLogObserver>();
 
-            services.AddSingleton<IMiningInfoNotifier>(x => x.GetRequiredService<TrexMiner>().StateHandler);
+            services.AddSingleton<IMiningInfoNotifier>(x => x.GetRequiredService<IMiner>().StateHandler);
 
             services.AddSingleton<IMinerLogListener, MinerListener>();
 

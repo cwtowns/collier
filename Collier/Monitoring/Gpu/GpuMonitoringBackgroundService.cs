@@ -44,7 +44,7 @@ namespace Collier.Monitoring.Gpu
             {
                 if (e.ActiveProcesses.Count == 0)
                 {
-                    if (await _miner.TransitionToStateAsync(new MinerStartedFromNoGaming()))
+                    if (await _miner.StateHandler.TransitionToStateAsync(new MinerStartedFromNoGaming()))
                     {
                         _logger.LogInformation("{methodName} {message}", "CheckActivity",
                             "Starting mining because no processes are running.");
@@ -52,7 +52,7 @@ namespace Collier.Monitoring.Gpu
                 }
                 else if (e.ActiveProcesses.Count > 0)
                 {
-                    if (await _miner.TransitionToStateAsync(new MinerStoppedFromGaming()))
+                    if (await _miner.StateHandler.TransitionToStateAsync(new MinerStoppedFromGaming()))
                     {
                         _logger.LogInformation("{methodName} {message} {processList}", "CheckActivity",
                             "Stopping mining because the following processes were found",
