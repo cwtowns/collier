@@ -38,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMiner, TrexMiner>();
             services.AddSingleton<IGpuMonitorOutputParser, GpuMonitorOutputParser_ProcessList>();
             services.AddSingleton<ITrexWebClient, TrexWebClient>();
-            services.AddSingleton<IGpuMonitoringBackgroundService, Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>();
+            services.AddSingleton<IBackgroundService<Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>, Collier.Monitoring.Gpu.GpuMonitoringBackgroundService>();
             services.AddSingleton<IGpuProcessMonitor<GpuProcessEvent>, GpuMonitorOutputParser_ProcessList>();
 
             services.AddSingleton<ProcessFactory, ProcessFactory>();
@@ -59,8 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMiningInfoNotifier, CrashCountLogObserver>();
             services.AddSingleton<IMiningInfoNotifier, TempLogObserver>();
 
-            services.AddSingleton<MinerStateNotifier>();
-            services.AddSingleton<IMiningInfoNotifier>(x => x.GetRequiredService<MinerStateNotifier>());
+            services.AddSingleton<IMiningInfoNotifier>(x => x.GetRequiredService<IMiner>().StateHandler);
 
             services.AddSingleton<IMinerLogListener, MinerListener>();
 

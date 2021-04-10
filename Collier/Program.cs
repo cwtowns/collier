@@ -67,7 +67,7 @@ namespace GrpcGreeter
                         log.AddSerilog(Log.Logger);
                     });
 
-                    webBuilder.UseUrls("http://localhost:9999");
+                    webBuilder.UseUrls("http://localhost:9999");  //TODO move to config file
 
                 });
         }

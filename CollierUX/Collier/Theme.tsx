@@ -3,6 +3,7 @@ import { Color } from 'react-color';
 interface MiningStateColors {
   mining: Color;
   paused: Color;
+  stopped: Color;
   unknown: Color;
 }
 
@@ -12,9 +13,15 @@ interface StatisticsStateColors {
   danger: Color;
 }
 
+interface MiningPowerButtonColors {
+  pauseRequested: Color;
+  startRequested: Color;
+}
+
 interface Theme {
   statisticsState: StatisticsStateColors;
   miningState: MiningStateColors;
+  powerButtonState: MiningPowerButtonColors;
 }
 
 const AppTheme: Theme = {
@@ -25,8 +32,13 @@ const AppTheme: Theme = {
   },
   miningState: {
     mining: 'green',
-    paused: 'red',
+    paused: 'yellow',
+    stopped: 'red',
     unknown: 'purple',
+  },
+  powerButtonState: {
+    pauseRequested: 'palegoldenrod',
+    startRequested: 'darkseagreen',
   },
 };
 

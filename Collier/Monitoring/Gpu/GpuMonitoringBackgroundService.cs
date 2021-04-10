@@ -6,17 +6,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Collier.Mining;
 using Collier.Monitoring.Gpu;
+using Collier.Mining.State;
 
 namespace Collier.Monitoring.Gpu
 {
-    public class GpuMonitoringBackgroundService : IBackgroundService<GpuMonitoringBackgroundService>, IGpuMonitoringBackgroundService
+    public class GpuMonitoringBackgroundService : IBackgroundService<GpuMonitoringBackgroundService>
     {
         public class Settings
         {
             public int PollingIntervalInSeconds { get; set; }
         }
-
-        public event EventHandler<GpuProcessEvent> ProcessEventTriggered;
 
         private readonly ILogger<GpuMonitoringBackgroundService> _logger;
         private readonly INvidiaSmiExecutor _smiExecutor;
@@ -43,24 +42,22 @@ namespace Collier.Monitoring.Gpu
         {
             try
             {
-                ProcessEventTriggered?.Invoke(o, e);
-
-                var minerRunning = await _miner.IsRunningAsync();
-
-                if (e.ActiveProcesses.Count == 0 && !minerRunning)
+                if (e.ActiveProcesses.Count == 0)
                 {
-                    _logger.LogInformation("{methodName} {message}", "CheckActivity",
-                        "Starting mining because no processes are running.");
-                    //TODO https://stackoverflow.com/questions/22629951/suppressing-warning-cs4014-because-this-call-is-not-awaited-execution-of-the
-                    //TODO https://stackoverflow.com/questions/22864367/fire-and-forget-approach/22864616#22864616
-                    _miner.Start();
+                    if (await _miner.StateHandler.TransitionToStateAsync(new MinerStartedFromNoGaming()))
+                    {
+                        _logger.LogInformation("{methodName} {message}", "CheckActivity",
+                            "Starting mining because no processes are running.");
+                    }
                 }
-                else if (e.ActiveProcesses.Count > 0 && minerRunning)
+                else if (e.ActiveProcesses.Count > 0)
                 {
-                    _logger.LogInformation("{methodName} {message} {processList}", "CheckActivity",
-                        "Stopping mining because the following processes were found",
-                        string.Join(',', e.ActiveProcesses));
-                    _miner.Stop();
+                    if (await _miner.StateHandler.TransitionToStateAsync(new MinerStoppedFromGaming()))
+                    {
+                        _logger.LogInformation("{methodName} {message} {processList}", "CheckActivity",
+                            "Stopping mining because the following processes were found",
+                            string.Join(',', e.ActiveProcesses));
+                    }
                 }
             }
             catch (Exception err)
@@ -75,11 +72,6 @@ namespace Collier.Monitoring.Gpu
 
             stoppingToken.Register(() =>
                 _logger.LogInformation("{methodName} {message}", "ExecuteAsync", "stopping"));
-
-            //it feels a little weird that this is here, as i don't know that starting the miner is this object's responsibilty.
-            //but one nice thing about it being here is I can test for it in a way that makes sense to me, as opposed to some
-            //generic BackgroundService object that does this work
-            _miner.Start();
 
             while (!stoppingToken.IsCancellationRequested)
             {
