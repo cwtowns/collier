@@ -22,8 +22,7 @@ interface StatisticCollection {
 }
 
 interface RawLogBacklog {
-  condencedLimit: number;
-  fullLimit: number;
+  maxBacklogTimeInMs: number;
 }
 
 interface RawLog {
@@ -89,8 +88,7 @@ const AppConfig: CollierConfig = {
   },
   rawLog: {
     backlog: {
-      condencedLimit: 10,
-      fullLimit: 100,
+      maxBacklogTimeInMs: 600000, //10 minutes
     },
   },
 };

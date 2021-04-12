@@ -1,21 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-
+import React, { useState, useEffect, useCallback } from 'react';
+import { SafeAreaView, Text, FlatList } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
+import { v4 as uuidv4 } from 'uuid';
+
+import { NativeScrollEvent } from 'react-native';
+import { NativeSyntheticEvent } from 'react-native';
+
+import AppConfig from './Config';
 
 interface RawLogProps {
   websocket: SignalR.HubConnection;
 }
 
+interface LogMessage {
+  id: string;
+  message: string;
+  timestamp: number;
+}
+
 const RawLog = (props: RawLogProps) => {
-  const maxBacklog: number = 100;
-
-  const scrollViewRef: React.RefObject<ScrollView> = React.createRef<ScrollView>();
-
-  const [performedFirstScroll, setPerformedFirstScroll] = useState(false);
-  const [logArray, setLogArray] = useState(
-    Array(maxBacklog).join(' ').split(' '),
-  );
+  const maxBacklogTimeInMs: number =
+    AppConfig.rawLog.backlog.maxBacklogTimeInMs;
+  const flatListRef: React.RefObject<FlatList> = React.createRef<FlatList>();
+  const [hasUserScrolled, setHasUserScrolled] = useState(false);
+  const [logArray, setLogArray] = useState([] as LogMessage[]);
 
   useEffect(() => {
     props.websocket.on('Log', message => {
@@ -28,38 +36,63 @@ const RawLog = (props: RawLogProps) => {
   });
 
   const updateLog = (message: string) => {
-    let newLog: string[];
+    const now: number = Date.now();
+    const cutoff: number = now - maxBacklogTimeInMs;
 
-    if (logArray.length < maxBacklog) {
-      newLog = logArray.concat(message);
+    let newLogArray: LogMessage[] = logArray.concat({
+      id: uuidv4(),
+      message: message,
+      timestamp: now,
+    });
+
+    let x: number = 0;
+    while (x < newLogArray.length && newLogArray[x].timestamp < cutoff) {
+      x++;
+    }
+
+    if (x < newLogArray.length) {
+      setLogArray(newLogArray.slice(x));
     } else {
-      newLog = [...logArray.slice(1, logArray.length), message];
+      setLogArray(newLogArray);
     }
 
-    setLogArray(newLog);
+    flatListRef.current?.scrollToEnd();
   };
 
-  const checkForFirstScroll = (width: number, height: number) => {
-    //oddly I could not get a simple scrollToEnd in useEffect() to work
-    if (performedFirstScroll === false) {
-      scrollViewRef.current?.scrollTo({ y: height });
-      setPerformedFirstScroll(true);
+  const checkToForceScrollToBottom = (_width: number, _height: number) => {
+    if (hasUserScrolled === false) {
+      flatListRef.current?.scrollToEnd();
     }
   };
+
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    let bottomCalculation: number =
+      e.nativeEvent.contentOffset.y + e.nativeEvent.layoutMeasurement.height;
+    let difference: number = Math.floor(
+      e.nativeEvent.contentSize.height - bottomCalculation,
+    );
+    setHasUserScrolled(difference > 0);
+  };
+
+  const renderItem = useCallback(
+    ({ item }: { item: LogMessage }) => <Text>{item.message}</Text>,
+    [],
+  );
+
+  const keyExtractor = useCallback(item => item.id, []);
 
   return (
-    <View style={{ height: 150, paddingTop: 10 }}>
-      <ScrollView
-        ref={scrollViewRef}
-        style={{ width: '100%', margin: 5 }}
-        onContentSizeChange={(width, height) =>
-          checkForFirstScroll(width, height)
-        }>
-        {logArray.map((txt, i) => (
-          <Text key={i}>{txt}</Text>
-        ))}
-      </ScrollView>
-    </View>
+    <SafeAreaView>
+      <FlatList
+        ref={flatListRef}
+        style={{ height: 150, paddingTop: 10 }}
+        data={logArray}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        onScroll={onScroll}
+        onContentSizeChange={checkToForceScrollToBottom}
+      />
+    </SafeAreaView>
   );
 };
 
