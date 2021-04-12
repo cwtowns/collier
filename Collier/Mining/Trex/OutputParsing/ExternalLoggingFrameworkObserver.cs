@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Collier.Mining.OutputParsing
+namespace Collier.Mining.Trex.OutputParsing
 {
     public class ExternalLoggingFrameworkObserver : IMiningInfoNotifier
     {

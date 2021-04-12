@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Collier.Host;
 using Collier.IO;
 using Collier.Mining;
+using Collier.Mining.Trex;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Collier.Monitoring.Gpu;
 using Microsoft.Extensions.Logging;
 
-namespace Collier.Mining
+namespace Collier.Mining.Trex
 {
     public class TrexWebClient : ITrexWebClient
     {

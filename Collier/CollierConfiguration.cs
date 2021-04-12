@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using Collier.Host;
 using Collier.IO;
 using Collier.Mining;
+using Collier.Mining.Trex;
+using Collier.Mining.Trex.OutputParsing;
 using Collier.Monitoring.Gpu;
-using Collier.Mining.OutputParsing;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection

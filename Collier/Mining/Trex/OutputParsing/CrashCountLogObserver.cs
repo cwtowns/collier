@@ -8,7 +8,7 @@ using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Collier.Mining.OutputParsing
+namespace Collier.Mining.Trex.OutputParsing
 {
     public class CrashCountLogObserver : IMiningInfoNotifier
     {

@@ -1,19 +1,19 @@
-﻿using Collier.Host;
-using MathNet.Numerics.Statistics;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Collier.Host;
+using MathNet.Numerics.Statistics;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace Collier.Mining.OutputParsing
+namespace Collier.Mining.Trex.OutputParsing
 {
-    public class TempLogObserver : IMiningInfoNotifier
+    public class HashRateLogObserver : IMiningInfoNotifier
     {
-        private readonly ILogger<TempLogObserver> _logger;
-        private readonly Regex _searchRegex = new Regex(@"GPU .* \[T:(\d*)C,");
+        private readonly ILogger<HashRateLogObserver> _logger;
+        private readonly Regex _searchRegex = new Regex(@"GPU .* - (\d*\.?\d+) MH/s,");
         private readonly MovingStatistics _movingStatistics;
 
         public class Settings
@@ -29,7 +29,7 @@ namespace Collier.Mining.OutputParsing
 
         public event EventHandler<MiningInformation> MiningInformationChanged;
 
-        public TempLogObserver(ILogger<TempLogObserver> logger, IOptions<Settings> options, IMinerLogListener logListener)
+        public HashRateLogObserver(ILogger<HashRateLogObserver> logger, IOptions<Settings> options, IMinerLogListener logListener)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             logListener = logListener ?? throw new ArgumentNullException(nameof(logListener));
@@ -47,10 +47,10 @@ namespace Collier.Mining.OutputParsing
                 if (!match.Success)
                     return;
 
-                if (int.TryParse(match.Groups[1].Value, out int temp))
+                if (double.TryParse(match.Groups[1].Value, out double hashRate))
                 {
-                    LastTemp = temp;
-                    _movingStatistics.Push(temp);
+                    LastHashRate = hashRate;
+                    _movingStatistics.Push(hashRate);
                     Notify();
                 }
                 else
@@ -65,14 +65,14 @@ namespace Collier.Mining.OutputParsing
 
         public virtual void Notify()
         {
-            var miningInformation = new MiningInformation() { Name = "AverageTemp", Value = AverageTemp.ToString() };
+            var miningInformation = new MiningInformation() { Name = "AverageHashRate", Value = AverageHashRate.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);
-            miningInformation = new MiningInformation() { Name = "LastTemp", Value = LastTemp.ToString() };
+            miningInformation = new MiningInformation() { Name = "LastHashRate", Value = LastHashRate.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);
         }
 
-        public virtual int AverageTemp => _movingStatistics.Count == 0 ? 0 : Convert.ToInt32(_movingStatistics.Mean);
+        public virtual double AverageHashRate => _movingStatistics.Count == 0 ? 0 : _movingStatistics.Mean;
 
-        public virtual int LastTemp { get; private set; }
+        public virtual double LastHashRate { get; private set; }
     }
 }

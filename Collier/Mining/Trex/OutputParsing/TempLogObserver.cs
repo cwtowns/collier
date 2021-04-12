@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Collier.Host;
+using MathNet.Numerics.Statistics;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Collier.Host;
-using MathNet.Numerics.Statistics;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
-namespace Collier.Mining.OutputParsing
+namespace Collier.Mining.Trex.OutputParsing
 {
-    public class PowerLogObserver : IMiningInfoNotifier
+    public class TempLogObserver : IMiningInfoNotifier
     {
-        private readonly ILogger<PowerLogObserver> _logger;
-        private readonly Regex _searchRegex = new Regex(@"GPU .* P:(\d*)W,");
+        private readonly ILogger<TempLogObserver> _logger;
+        private readonly Regex _searchRegex = new Regex(@"GPU .* \[T:(\d*)C,");
         private readonly MovingStatistics _movingStatistics;
 
         public class Settings
@@ -29,7 +29,7 @@ namespace Collier.Mining.OutputParsing
 
         public event EventHandler<MiningInformation> MiningInformationChanged;
 
-        public PowerLogObserver(ILogger<PowerLogObserver> logger, IOptions<Settings> options, IMinerLogListener logListener)
+        public TempLogObserver(ILogger<TempLogObserver> logger, IOptions<Settings> options, IMinerLogListener logListener)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             logListener = logListener ?? throw new ArgumentNullException(nameof(logListener));
@@ -47,10 +47,10 @@ namespace Collier.Mining.OutputParsing
                 if (!match.Success)
                     return;
 
-                if (int.TryParse(match.Groups[1].Value, out int power))
+                if (int.TryParse(match.Groups[1].Value, out int temp))
                 {
-                    LastPower = power;
-                    _movingStatistics.Push(power);
+                    LastTemp = temp;
+                    _movingStatistics.Push(temp);
                     Notify();
                 }
                 else
@@ -63,16 +63,16 @@ namespace Collier.Mining.OutputParsing
         }
 #pragma warning restore 1998
 
-        public void Notify()
+        public virtual void Notify()
         {
-            var miningInformation = new MiningInformation() { Name = "AveragePower", Value = AveragePower.ToString() };
+            var miningInformation = new MiningInformation() { Name = "AverageTemp", Value = AverageTemp.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);
-            miningInformation = new MiningInformation() { Name = "LastPower", Value = LastPower.ToString() };
+            miningInformation = new MiningInformation() { Name = "LastTemp", Value = LastTemp.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);
         }
 
-        public virtual int AveragePower => _movingStatistics.Count == 0 ? 0 : Convert.ToInt32(_movingStatistics.Mean);
+        public virtual int AverageTemp => _movingStatistics.Count == 0 ? 0 : Convert.ToInt32(_movingStatistics.Mean);
 
-        public virtual int LastPower { get; private set; }
+        public virtual int LastTemp { get; private set; }
     }
 }

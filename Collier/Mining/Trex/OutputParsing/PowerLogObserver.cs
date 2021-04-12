@@ -8,12 +8,12 @@ using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Collier.Mining.OutputParsing
+namespace Collier.Mining.Trex.OutputParsing
 {
-    public class HashRateLogObserver : IMiningInfoNotifier
+    public class PowerLogObserver : IMiningInfoNotifier
     {
-        private readonly ILogger<HashRateLogObserver> _logger;
-        private readonly Regex _searchRegex = new Regex(@"GPU .* - (\d*\.?\d+) MH/s,");
+        private readonly ILogger<PowerLogObserver> _logger;
+        private readonly Regex _searchRegex = new Regex(@"GPU .* P:(\d*)W,");
         private readonly MovingStatistics _movingStatistics;
 
         public class Settings
@@ -29,7 +29,7 @@ namespace Collier.Mining.OutputParsing
 
         public event EventHandler<MiningInformation> MiningInformationChanged;
 
-        public HashRateLogObserver(ILogger<HashRateLogObserver> logger, IOptions<Settings> options, IMinerLogListener logListener)
+        public PowerLogObserver(ILogger<PowerLogObserver> logger, IOptions<Settings> options, IMinerLogListener logListener)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             logListener = logListener ?? throw new ArgumentNullException(nameof(logListener));
@@ -47,10 +47,10 @@ namespace Collier.Mining.OutputParsing
                 if (!match.Success)
                     return;
 
-                if (double.TryParse(match.Groups[1].Value, out double hashRate))
+                if (int.TryParse(match.Groups[1].Value, out int power))
                 {
-                    LastHashRate = hashRate;
-                    _movingStatistics.Push(hashRate);
+                    LastPower = power;
+                    _movingStatistics.Push(power);
                     Notify();
                 }
                 else
@@ -63,16 +63,16 @@ namespace Collier.Mining.OutputParsing
         }
 #pragma warning restore 1998
 
-        public virtual void Notify()
+        public void Notify()
         {
-            var miningInformation = new MiningInformation() { Name = "AverageHashRate", Value = AverageHashRate.ToString() };
+            var miningInformation = new MiningInformation() { Name = "AveragePower", Value = AveragePower.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);
-            miningInformation = new MiningInformation() { Name = "LastHashRate", Value = LastHashRate.ToString() };
+            miningInformation = new MiningInformation() { Name = "LastPower", Value = LastPower.ToString() };
             MiningInformationChanged?.Invoke(this, miningInformation);
         }
 
-        public virtual double AverageHashRate => _movingStatistics.Count == 0 ? 0 : _movingStatistics.Mean;
+        public virtual int AveragePower => _movingStatistics.Count == 0 ? 0 : Convert.ToInt32(_movingStatistics.Mean);
 
-        public virtual double LastHashRate { get; private set; }
+        public virtual int LastPower { get; private set; }
     }
 }

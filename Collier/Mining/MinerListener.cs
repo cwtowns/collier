@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Collier.Mining.OutputParsing;
 
 namespace Collier.Mining
 {
+
+    /// <summary>
+    /// An object to subscribe to in order to receive miner output log messages.
+    /// All statistics about mining are obtained from the log file, so any observers
+    /// will receive an instance of IMinerLogListener so they can be notified of log output
+    /// </summary>
     public interface IMinerLogListener
     {
         event EventHandler<LogMessage> LogMessageReceived;

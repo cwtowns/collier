@@ -10,6 +10,8 @@ using System.Threading;
 using Collier.Mining;
 using Xunit;
 using Collier.Mining.State;
+using Collier.Mining.Trex;
+using Collier.Mining.Trex.State;
 
 namespace CollierTests.Monitoring
 {

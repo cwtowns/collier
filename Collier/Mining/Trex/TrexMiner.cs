@@ -6,10 +6,10 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Collier.Mining;
-using Collier.Mining.OutputParsing;
 using Collier.Mining.State;
+using Collier.Mining.Trex.State;
 
-namespace Collier.Mining
+namespace Collier.Mining.Trex
 {
 
     //to pause you have to specify the exact GPU  like with this:   http://127.0.0.1:4067/control?pause=true:0
@@ -259,10 +259,5 @@ namespace Collier.Mining
                 return false;
             }
         }
-    }
-
-    public interface IMinerStateHandler : IMiningInfoNotifier
-    {
-        Task<bool> TransitionToStateAsync(IMinerState state);
     }
 }

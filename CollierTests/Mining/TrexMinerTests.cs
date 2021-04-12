@@ -4,8 +4,8 @@ using Microsoft.Extensions.Options;
 using Collier.IO;
 using Collier.Mining;
 using Moq;
-using Collier.Mining.OutputParsing;
 using Xunit;
+using Collier.Mining.Trex;
 
 namespace CollierTests.Mining
 {

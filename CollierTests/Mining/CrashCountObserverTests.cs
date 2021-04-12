@@ -1,11 +1,10 @@
 ﻿using Collier.Mining;
-using Collier.Mining.OutputParsing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Xunit;
 using Moq;
 using FluentAssertions;
-
+using Collier.Mining.Trex.OutputParsing;
 
 namespace CollierTests.Mining
 {

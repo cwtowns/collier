@@ -8,13 +8,8 @@ using Collier.Mining;
 using Collier.Host;
 using Microsoft.Extensions.Logging;
 
-namespace Collier.Mining.OutputParsing
+namespace Collier.Mining.Trex.OutputParsing
 {
-    public interface IInternalLoggingFrameworkObserver
-    {
-        void ReceiveLogMessage(object sender, LogMessage message);
-    }
-
     /// <summary>
     /// Handles monitoring the process output for the service's internal logging diagnostics.
     /// </summary>

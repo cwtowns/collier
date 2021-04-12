@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using TestingUtilities;
 using Xunit;
+using Collier.Mining.Trex;
 
 namespace CollierTests.Mining
 {

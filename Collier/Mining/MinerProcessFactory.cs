@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Collier.Host;
 using Collier.IO;
+using Collier.Mining.Trex;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
