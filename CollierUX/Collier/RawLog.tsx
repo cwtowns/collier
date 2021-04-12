@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView, Text, FlatList } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
 import { v4 as uuidv4 } from 'uuid';
@@ -74,9 +74,12 @@ const RawLog = (props: RawLogProps) => {
     setHasUserScrolled(difference > 0);
   };
 
-  const renderItem = ({ item }: { item: LogMessage }) => (
-    <Text>{item.message}</Text>
+  const renderItem = useCallback(
+    ({ item }: { item: LogMessage }) => <Text>{item.message}</Text>,
+    [],
   );
+
+  const keyExtractor = useCallback(item => item.id, []);
 
   return (
     <SafeAreaView>
@@ -85,11 +88,9 @@ const RawLog = (props: RawLogProps) => {
         style={{ height: 150, paddingTop: 10 }}
         data={logArray}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={keyExtractor}
         onScroll={onScroll}
-        onContentSizeChange={(width, height) =>
-          checkToForceScrollToBottom(width, height)
-        }
+        onContentSizeChange={checkToForceScrollToBottom}
       />
     </SafeAreaView>
   );
