@@ -59,6 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMiningInfoNotifier, PowerLogObserver>();
             services.AddSingleton<IMiningInfoNotifier, CrashCountLogObserver>();
             services.AddSingleton<IMiningInfoNotifier, TempLogObserver>();
+            services.AddSingleton<IMiningInfoNotifier, MinerUpdateAvailableObserver>();
 
             services.AddSingleton<IMiningInfoNotifier>(x => x.GetRequiredService<IMiner>().StateHandler);
 

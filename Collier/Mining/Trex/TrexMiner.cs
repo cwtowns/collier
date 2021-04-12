@@ -16,6 +16,8 @@ namespace Collier.Mining.Trex
     //to check status and see if I am mining, the hashrate property will be 0 or non zero.
     public class TrexMiner : IMiner, IDisposable
     {
+        public const string STARTUP_LOG_MESSAGE = "ApiServer: Telnet server started on";
+
         public class Settings
         {
             public Settings()

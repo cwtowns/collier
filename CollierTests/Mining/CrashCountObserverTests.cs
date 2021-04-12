@@ -5,6 +5,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 using Collier.Mining.Trex.OutputParsing;
+using Collier.Mining.Trex;
 
 namespace CollierTests.Mining
 {
@@ -56,7 +57,7 @@ namespace CollierTests.Mining
 
             objectUnderTest.ReceiveLogMessage(this, new LogMessage() { Message = "GPU CRASH LIST" });
             objectUnderTest.ReceiveLogMessage(this, new LogMessage() { Message = "WD: GPU#0: " + crashCount });
-            objectUnderTest.ReceiveLogMessage(this, new LogMessage() { Message = "ApiServer: Telnet server started on" });
+            objectUnderTest.ReceiveLogMessage(this, new LogMessage() { Message = TrexMiner.STARTUP_LOG_MESSAGE });
 
             objectUnderTest.CrashCount.Should().Be(0, "we faked restarting the miner");
         }

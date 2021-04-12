@@ -26,7 +26,7 @@ namespace Collier.Mining.Trex.OutputParsing
 
         public virtual void Notify()
         {
-            //no-op for now, maybe this tracks and keeps some log information for the future (last 10 lines or so)
+            //no-op for now, maybe this tracks a few lines of backlog so we could push to the client when it connects
         }
     }
 }
