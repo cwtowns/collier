@@ -7,6 +7,7 @@ import { NativeScrollEvent } from 'react-native';
 import { NativeSyntheticEvent } from 'react-native';
 
 import AppConfig from './Config';
+import Theme from './Theme';
 
 interface RawLogProps {
   websocket: SignalR.HubConnection;
@@ -102,7 +103,9 @@ const RawLog = (props: RawLogProps) => {
   return (
     <SafeAreaView>
       {minerUpdateAvailable && (
-        <Text style={{ color: 'yellow' }}>Miner Update Available</Text>
+        <Text style={{ color: Theme.rawLog.updateMessage.toString() }}>
+          Miner Update Available
+        </Text>
       )}
       <FlatList
         ref={flatListRef}

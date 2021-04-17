@@ -18,10 +18,15 @@ interface MiningPowerButtonColors {
   startRequested: Color;
 }
 
+interface RawLogColors {
+  updateMessage: Color;
+}
+
 interface Theme {
   statisticsState: StatisticsStateColors;
   miningState: MiningStateColors;
   powerButtonState: MiningPowerButtonColors;
+  rawLog: RawLogColors;
 }
 
 const AppTheme: Theme = {
@@ -39,6 +44,9 @@ const AppTheme: Theme = {
   powerButtonState: {
     pauseRequested: 'palegoldenrod',
     startRequested: 'darkseagreen',
+  },
+  rawLog: {
+    updateMessage: 'yellow',
   },
 };
 
