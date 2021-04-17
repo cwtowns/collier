@@ -35,14 +35,20 @@ const RawLog = (props: RawLogProps) => {
   const flatListRef: React.RefObject<FlatList> = React.createRef<FlatList>();
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
   const [logArray, setLogArray] = useState([] as LogMessage[]);
+  const [minerUpdateAvailable, setMinerUpdateAvailable] = useState(false);
 
   useEffect(() => {
     props.websocket.on('Log', message => {
       updateLog(message);
     });
 
+    props.websocket.on('MinerUpdateAvailable', message => {
+      setMinerUpdateAvailable(message.toLowerCase() === 'true');
+    });
+
     return () => {
       props.websocket.off('Log');
+      props.websocket.off('MinerUpdateAvailable');
     };
   });
 
@@ -95,6 +101,9 @@ const RawLog = (props: RawLogProps) => {
 
   return (
     <SafeAreaView>
+      {minerUpdateAvailable && (
+        <Text style={{ color: 'yellow' }}>Miner Update Available</Text>
+      )}
       <FlatList
         ref={flatListRef}
         style={{ height: 150, paddingTop: 10 }}
