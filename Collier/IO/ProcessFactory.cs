@@ -3,6 +3,9 @@ using System.Diagnostics;
 
 namespace Collier.IO
 {
+    /// <summary>
+    /// Helper class to make testing process based work easier
+    /// </summary>
     public class ProcessFactory
     {
         public virtual IProcess GetProcess(ProcessStartInfo startInfo)
@@ -19,7 +22,7 @@ namespace Collier.IO
             Process[] processCollection = Process.GetProcessesByName(processName);
             foreach (Process p in processCollection)
             {
-                results.Add( new ProcessWrapper(p));
+                results.Add(new ProcessWrapper(p));
             }
 
             return results;

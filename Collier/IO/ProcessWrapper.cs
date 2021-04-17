@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace Collier.IO
 {
+    /// <summary>
+    /// Helper class to make testing process based work easier
+    /// </summary>
     public class ProcessWrapper : IProcess
     {
         private readonly Process _process;

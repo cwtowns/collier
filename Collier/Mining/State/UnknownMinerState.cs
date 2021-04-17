@@ -10,6 +10,8 @@ namespace Collier.Mining.State
         {
             if (miner.CurrentState == null)
                 miner.CurrentState = this;
+
+            await Task.CompletedTask;
         }
 
         public override bool Equals(object obj)

@@ -72,6 +72,9 @@ namespace Collier.Monitoring.Gpu
 
                     var processes = firstValue.SelectToken("Processes") as JObject;
 
+                    if (processes == null)
+                        continue;
+
                     foreach (var processProperty in processes.Properties())
                     {
                         if (!processProperty.Name.StartsWith("Process ID_"))

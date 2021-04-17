@@ -8,13 +8,12 @@ using MathNet.Numerics.Statistics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Collier.Mining.OutputParsing
+namespace Collier.Mining.Trex.OutputParsing
 {
     public class CrashCountLogObserver : IMiningInfoNotifier
     {
         private readonly Regex _searchRegex = new Regex(@"WD: GPU#\d*: (\d*)");
         private readonly string _crashIdentifier = "GPU CRASH LIST";
-        private readonly string _startupString = "ApiServer: Telnet server started on";
         private bool isNextMessageCrashCount = false;
         private readonly ILogger<CrashCountLogObserver> _logger;
 
@@ -32,7 +31,7 @@ namespace Collier.Mining.OutputParsing
         {
             try
             {
-                if (message.Message.StartsWith(_startupString))
+                if (message.Message.StartsWith(TrexMiner.STARTUP_LOG_MESSAGE))
                 {
                     isNextMessageCrashCount = false;
                     CrashCount = 0;

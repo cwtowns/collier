@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, Text, FlatList } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { SafeAreaView, Text, FlatList, ListRenderItem } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,20 +18,37 @@ interface LogMessage {
   timestamp: number;
 }
 
+const LogElement = (props: LogMessage) => {
+  return useMemo(() => {
+    return <Text>{props.message}</Text>;
+  }, [props.message]);
+};
+
+interface MyState {
+  logArray: LogMessage[];
+  counter: number;
+}
+
 const RawLog = (props: RawLogProps) => {
   const maxBacklogTimeInMs: number =
     AppConfig.rawLog.backlog.maxBacklogTimeInMs;
   const flatListRef: React.RefObject<FlatList> = React.createRef<FlatList>();
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
   const [logArray, setLogArray] = useState([] as LogMessage[]);
+  const [minerUpdateAvailable, setMinerUpdateAvailable] = useState(false);
 
   useEffect(() => {
     props.websocket.on('Log', message => {
       updateLog(message);
     });
 
+    props.websocket.on('MinerUpdateAvailable', message => {
+      setMinerUpdateAvailable(message.toLowerCase() === 'true');
+    });
+
     return () => {
       props.websocket.off('Log');
+      props.websocket.off('MinerUpdateAvailable');
     };
   });
 
@@ -74,20 +91,24 @@ const RawLog = (props: RawLogProps) => {
     setHasUserScrolled(difference > 0);
   };
 
-  const renderItem = useCallback(
-    ({ item }: { item: LogMessage }) => <Text>{item.message}</Text>,
-    [],
-  );
+  const renderItem: ListRenderItem<LogMessage> = ({ item }) => {
+    return <LogElement {...item} />;
+  };
 
-  const keyExtractor = useCallback(item => item.id, []);
+  const renderCallback = useMemo(() => renderItem, []);
+
+  const keyExtractor = (item: LogMessage) => item.id;
 
   return (
     <SafeAreaView>
+      {minerUpdateAvailable && (
+        <Text style={{ color: 'yellow' }}>Miner Update Available</Text>
+      )}
       <FlatList
         ref={flatListRef}
         style={{ height: 150, paddingTop: 10 }}
         data={logArray}
-        renderItem={renderItem}
+        renderItem={renderCallback}
         keyExtractor={keyExtractor}
         onScroll={onScroll}
         onContentSizeChange={checkToForceScrollToBottom}

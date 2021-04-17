@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Collier.Mining;
-using Collier.Mining.OutputParsing;
+using Collier.Mining.Trex.OutputParsing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Xunit;

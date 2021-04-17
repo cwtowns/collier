@@ -88,7 +88,7 @@ const AppConfig: CollierConfig = {
   },
   rawLog: {
     backlog: {
-      maxBacklogTimeInMs: 600000, //10 minutes
+      maxBacklogTimeInMs: 1200000, //20 minutes
     },
   },
 };

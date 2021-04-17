@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using Collier.Host;
 using Collier.IO;
 using Collier.Mining;
+using Collier.Mining.Trex;
+using Collier.Mining.Trex.OutputParsing;
 using Collier.Monitoring.Gpu;
-using Collier.Mining.OutputParsing;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -58,6 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMiningInfoNotifier, PowerLogObserver>();
             services.AddSingleton<IMiningInfoNotifier, CrashCountLogObserver>();
             services.AddSingleton<IMiningInfoNotifier, TempLogObserver>();
+            services.AddSingleton<IMiningInfoNotifier, MinerUpdateAvailableObserver>();
 
             services.AddSingleton<IMiningInfoNotifier>(x => x.GetRequiredService<IMiner>().StateHandler);
 

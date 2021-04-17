@@ -4,12 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Collier.Host;
 using Collier.Mining;
-using Collier.Mining.OutputParsing;
 using Collier.Mining.State;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Collier.Hubs
 {
+    /// <summary>
+    /// Server side web socket hub.  All public methods that are not overrides are publically callable
+    /// by connected clients.  
+    /// </summary>
     public class CollierHub : Hub<ICollierClient>
     {
         private readonly IApplicationCancellationTokenFactory _cancellationTokenFactory;
@@ -38,6 +41,10 @@ namespace Collier.Hubs
             _miner.StateHandler.Notify();
         }
 
+        /// <summary>
+        /// Pushes all state information to the client when the client connects / reconnects
+        /// </summary>
+        /// <returns></returns>
         public override async Task OnConnectedAsync()
         {
             await Clients.Caller.Connected();
