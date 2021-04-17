@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, Text, FlatList } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { SafeAreaView, Text, FlatList, ListRenderItem } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,6 +16,17 @@ interface LogMessage {
   id: string;
   message: string;
   timestamp: number;
+}
+
+const LogElement = (props: LogMessage) => {
+  return useMemo(() => {
+    return <Text>{props.message}</Text>;
+  }, [props.message]);
+};
+
+interface MyState {
+  logArray: LogMessage[];
+  counter: number;
 }
 
 const RawLog = (props: RawLogProps) => {
@@ -74,12 +85,13 @@ const RawLog = (props: RawLogProps) => {
     setHasUserScrolled(difference > 0);
   };
 
-  const renderItem = useCallback(
-    ({ item }: { item: LogMessage }) => <Text>{item.message}</Text>,
-    [],
-  );
+  const renderItem: ListRenderItem<LogMessage> = ({ item }) => {
+    return <LogElement {...item} />;
+  };
 
-  const keyExtractor = useCallback(item => item.id, []);
+  const renderCallback = useMemo(() => renderItem, []);
+
+  const keyExtractor = (item: LogMessage) => item.id;
 
   return (
     <SafeAreaView>
@@ -87,7 +99,7 @@ const RawLog = (props: RawLogProps) => {
         ref={flatListRef}
         style={{ height: 150, paddingTop: 10 }}
         data={logArray}
-        renderItem={renderItem}
+        renderItem={renderCallback}
         keyExtractor={keyExtractor}
         onScroll={onScroll}
         onContentSizeChange={checkToForceScrollToBottom}
