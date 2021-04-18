@@ -6,11 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { NativeScrollEvent } from 'react-native';
 import { NativeSyntheticEvent } from 'react-native';
 
-import AppConfig from './Config';
-import Theme from './Theme';
+import { CollierConfig } from './Config';
 
 interface RawLogProps {
   websocket: SignalR.HubConnection;
+  config: CollierConfig;
 }
 
 interface LogMessage {
@@ -25,14 +25,9 @@ const LogElement = (props: LogMessage) => {
   }, [props.message]);
 };
 
-interface MyState {
-  logArray: LogMessage[];
-  counter: number;
-}
-
 const RawLog = (props: RawLogProps) => {
   const maxBacklogTimeInMs: number =
-    AppConfig.rawLog.backlog.maxBacklogTimeInMs;
+    props.config.config.rawLog.backlog.maxBacklogTimeInMs;
   const flatListRef: React.RefObject<FlatList> = React.createRef<FlatList>();
   const [hasUserScrolled, setHasUserScrolled] = useState(false);
   const [logArray, setLogArray] = useState([] as LogMessage[]);
@@ -103,7 +98,8 @@ const RawLog = (props: RawLogProps) => {
   return (
     <SafeAreaView>
       {minerUpdateAvailable && (
-        <Text style={{ color: Theme.rawLog.updateMessage.toString() }}>
+        <Text
+          style={{ color: props.config.theme.rawLog.updateMessage.toString() }}>
           Miner Update Available
         </Text>
       )}

@@ -1,3 +1,56 @@
+import { NativeModules } from 'react-native';
+import { Color } from 'react-color';
+
+interface MiningStateColors {
+  mining: Color;
+  paused: Color;
+  stopped: Color;
+  unknown: Color;
+}
+
+interface StatisticsStateColors {
+  good: Color;
+  caution: Color;
+  danger: Color;
+}
+
+interface MiningPowerButtonColors {
+  pauseRequested: Color;
+  startRequested: Color;
+}
+
+interface RawLogColors {
+  updateMessage: Color;
+}
+
+export type Theme = {
+  statisticsState: StatisticsStateColors;
+  miningState: MiningStateColors;
+  powerButtonState: MiningPowerButtonColors;
+  rawLog: RawLogColors;
+};
+
+const AppTheme: Theme = {
+  statisticsState: {
+    good: 'green',
+    caution: 'yellow',
+    danger: 'red',
+  },
+  miningState: {
+    mining: 'green',
+    paused: 'yellow',
+    stopped: 'red',
+    unknown: 'purple',
+  },
+  powerButtonState: {
+    pauseRequested: 'palegoldenrod',
+    startRequested: 'darkseagreen',
+  },
+  rawLog: {
+    updateMessage: 'yellow',
+  },
+};
+
 interface StateThresholds {
   good: number;
   caution: number;
@@ -29,12 +82,17 @@ interface RawLog {
   backlog: RawLogBacklog;
 }
 
-interface CollierConfig {
+interface Config {
   statStates: StatisticCollection;
   rawLog: RawLog;
 }
 
-const AppConfig: CollierConfig = {
+export type CollierConfig = {
+  config: Config;
+  theme: Theme;
+};
+
+const AppConfig: Config = {
   statStates: {
     power: {
       icon: {
@@ -93,4 +151,42 @@ const AppConfig: CollierConfig = {
   },
 };
 
-export default AppConfig;
+export const loadConfiguration: Promise<CollierConfig> = new Promise<CollierConfig>(
+  function (mainResolve, mainReject) {
+    const configPromise = new Promise<Config>(function (resolve, reject) {
+      NativeModules.appData
+        .getAppSettings('config.json', JSON.stringify(AppConfig))
+        .then((result: string) => {
+          const configObject: Config = {} as Config;
+          console.log('configuration back from server');
+          let objectData = JSON.parse(result);
+          Object.assign(configObject, objectData);
+          resolve(configObject);
+        })
+        .catch(reject);
+    });
+
+    const themePromise = new Promise<Theme>(function (resolve, reject) {
+      NativeModules.appData
+        .getAppSettings('theme.json', JSON.stringify(AppTheme))
+        .then((result: string) => {
+          const themeObject: Theme = {} as Theme;
+          console.log('configuration back from server');
+          let objectData = JSON.parse(result);
+          Object.assign(themeObject, objectData);
+          resolve(themeObject);
+        })
+        .catch(reject);
+    });
+
+    Promise.all([configPromise, themePromise])
+      .then(data => {
+        const fullConfig: CollierConfig = {
+          config: data[0],
+          theme: data[1],
+        };
+        mainResolve(fullConfig);
+      })
+      .catch(mainReject);
+  },
+);

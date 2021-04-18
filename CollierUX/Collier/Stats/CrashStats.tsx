@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { MyProps } from './StatsCommon';
 import StatContainer from './StatContainer';
 
-import AppConfig from '../Config';
-
 const CrashStats = (props: MyProps) => {
   const [last, setLast] = useState(0);
 
@@ -20,9 +18,10 @@ const CrashStats = (props: MyProps) => {
 
   return (
     <StatContainer
-      config={AppConfig.statStates.crash}
+      config={props.config.config.statStates.crash}
       averageValue={0}
       lastValue={last}
+      appConfig={props.config}
     />
   );
 };
