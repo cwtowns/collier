@@ -27,9 +27,9 @@ export type CollierHubConnection = SignalR.HubConnection & HubRemoveHandlers;
 export function convertHubConnection(
   hubConnection: SignalR.HubConnection,
 ): CollierHubConnection {
-  const closedCallbacks: Array<(error?: Error) => void> = [];
-  const reconnectingCallbacks: Array<(error?: Error) => void> = [];
-  const reconnectedCallbacks: Array<(connectionId?: string) => void> = [];
+  let closedCallbacks: Array<(error?: Error) => void> = [];
+  let reconnectingCallbacks: Array<(error?: Error) => void> = [];
+  let reconnectedCallbacks: Array<(connectionId?: string) => void> = [];
 
   const myOnCloseHandler = (error?: Error): void => {
     closedCallbacks.forEach(element => {
@@ -38,6 +38,9 @@ export function convertHubConnection(
   };
 
   hubConnection.onclose(myOnCloseHandler);
+  hubConnection.onclose = (callback: (error?: Error) => void) => {
+    closedCallbacks = closedCallbacks.concat(callback);
+  };
 
   const removeOnClose = (callback: (error?: Error) => void) => {
     if (!callback) {
@@ -58,6 +61,9 @@ export function convertHubConnection(
   };
 
   hubConnection.onreconnecting(myOnReconnectingHandler);
+  hubConnection.onreconnecting = (callback: (error?: Error) => void) => {
+    reconnectingCallbacks = reconnectingCallbacks.concat(callback);
+  };
 
   const removeOnReconnecting = (callback: (error?: Error) => void) => {
     if (!callback) {
@@ -78,6 +84,9 @@ export function convertHubConnection(
   };
 
   hubConnection.onreconnected(myOnReconnectedHandler);
+  hubConnection.onreconnected = (callback: (connectionid?: string) => void) => {
+    reconnectedCallbacks = reconnectedCallbacks.concat(callback);
+  };
 
   const removeOnReconnected = (callback: (connectionid?: string) => void) => {
     if (!callback) {

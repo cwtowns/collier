@@ -10,12 +10,8 @@ import {
   convertHubConnection,
   CollierHubConnection,
 } from './Collier/HubConnection';
-//TODO
-//  1. text selection from the UX doesn't work
-//  2. update notification for t-rex miner
-//  3. external configuration file
-//  4. update the read me and make a getting started guide
-//  5. power button clickable client side instead of starting / stopping service?
+
+import { loadConfiguration, CollierConfig } from './Collier/Config';
 
 const CollierApp = () => {
   const hub_endpoint: string = 'http://localhost:9999/miner'; //TODO externalize to config
@@ -31,6 +27,14 @@ const CollierApp = () => {
 
   let connection: CollierHubConnection = createConnection();
   const [webSocket, setWebSocket] = useState(connection); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [configObject, setConfigObject] = useState<CollierConfig>();
+
+  useEffect(() => {
+    loadConfiguration.then(function (config) {
+      console.log('configuration loaded:  ' + JSON.stringify(config));
+      setConfigObject(config);
+    });
+  }, [configObject]);
 
   useEffect(() => {
     let reconnectTimeout: number = 0;
@@ -90,29 +94,33 @@ const CollierApp = () => {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <View style={{ marginBottom: 10, marginLeft: 10, marginRight: 10 }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          borderBottomWidth: 1,
-          borderColor: 'grey',
-        }}>
+  if (configObject !== undefined) {
+    return (
+      <View style={{ marginBottom: 10, marginLeft: 10, marginRight: 10 }}>
         <View
           style={{
-            flex: 3,
-            justifyContent: 'center',
-            alignItems: 'center',
+            flexDirection: 'row',
+            borderBottomWidth: 1,
+            borderColor: 'grey',
           }}>
-          <MiningStateControl websocket={webSocket} />
+          <View
+            style={{
+              flex: 3,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <MiningStateControl config={configObject} websocket={webSocket} />
+          </View>
+          <View style={{ flex: 7 }}>
+            <StatsPanel config={configObject} websocket={webSocket} />
+          </View>
         </View>
-        <View style={{ flex: 7 }}>
-          <StatsPanel websocket={webSocket} />
-        </View>
+        <RawLog websocket={webSocket} config={configObject} />
       </View>
-      <RawLog websocket={webSocket} />
-    </View>
-  );
+    );
+  } else {
+    return <View />;
+  }
 };
 
 export default CollierApp;

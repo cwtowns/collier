@@ -1,18 +1,17 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Statistic } from '../Config';
+import { Statistic, CollierConfig } from '../Config';
 import { Color } from 'react-color';
 
 interface MyProps {
   averageValue: number;
   lastValue: number;
   config: Statistic;
+  appConfig: CollierConfig;
 }
 
 type StatState = 'good' | 'caution' | 'danger';
-
-import AppTheme from '../Theme';
 
 const StatContainer = (props: MyProps) => {
   const calculateStatState = (): StatState => {
@@ -36,13 +35,13 @@ const StatContainer = (props: MyProps) => {
   const getStateColor = (): Color => {
     const state = calculateStatState();
     if (state === 'good') {
-      return AppTheme.statisticsState.good;
+      return props.appConfig.theme.statisticsState.good;
     }
     if (state === 'caution') {
-      return AppTheme.statisticsState.caution;
+      return props.appConfig.theme.statisticsState.caution;
     }
     if (state === 'danger') {
-      return AppTheme.statisticsState.danger;
+      return props.appConfig.theme.statisticsState.danger;
     }
 
     throw new Error('Unsupported state:  ' + state);

@@ -4,7 +4,6 @@ import { Button } from 'react-native-elements';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { MyProps } from './StatsCommon';
-import AppTheme from '../Theme';
 import { Color } from 'react-color';
 import { GestureResponderEvent } from 'react-native';
 
@@ -56,22 +55,22 @@ const MiningStateControl = (props: MyProps) => {
   }, [props.websocket]);
 
   const getStateColor = (): Color => {
-    let result: Color = AppTheme.miningState.unknown;
+    let result: Color = props.config.theme.miningState.unknown;
 
     if (state === 'Running') {
-      result = AppTheme.miningState.mining;
+      result = props.config.theme.miningState.mining;
     }
     if (state === 'UserPaused') {
-      result = AppTheme.miningState.paused;
+      result = props.config.theme.miningState.paused;
     }
     if (state === 'Stopped') {
-      result = AppTheme.miningState.stopped;
+      result = props.config.theme.miningState.stopped;
     }
 
     if (buttonState === 'PauseRequested') {
-      result = AppTheme.powerButtonState.pauseRequested;
+      result = props.config.theme.powerButtonState.pauseRequested;
     } else if (buttonState === 'StartRequested') {
-      result = AppTheme.powerButtonState.startRequested;
+      result = props.config.theme.powerButtonState.startRequested;
     }
 
     return result;

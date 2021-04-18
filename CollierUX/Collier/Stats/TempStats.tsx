@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { MyProps } from './StatsCommon';
 import StatContainer from './StatContainer';
 
-import AppConfig from '../Config';
-
 const TempStats = (props: MyProps) => {
   const [average, setAverage] = useState(0);
   const [last, setLast] = useState(0);
@@ -26,7 +24,8 @@ const TempStats = (props: MyProps) => {
 
   return (
     <StatContainer
-      config={AppConfig.statStates.temp}
+      config={props.config.config.statStates.temp}
+      appConfig={props.config}
       averageValue={average}
       lastValue={last}
     />
