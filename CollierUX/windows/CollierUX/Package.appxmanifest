@@ -8,14 +8,14 @@
 
   <Identity
     Name="4a17bf37-6529-49ce-9766-08ae29130a83"
-    Publisher="CN=hodge"
-    Version="1.0.0.0" />
+    Publisher="CN=cwtowns"
+    Version="1.0.6.0" />
 
   <mp:PhoneIdentity PhoneProductId="4a17bf37-6529-49ce-9766-08ae29130a83" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>collierux</DisplayName>
-    <PublisherDisplayName>hodge</PublisherDisplayName>
+    <PublisherDisplayName>cwtowns</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -38,7 +38,7 @@
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="Front end to Collier mining service."
         BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
     </Application>
