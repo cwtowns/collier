@@ -9,7 +9,7 @@
   <Identity
     Name="4a17bf37-6529-49ce-9766-08ae29130a83"
     Publisher="CN=cwtowns"
-    Version="1.0.6.0" />
+    Version="1.0.8.0" />
 
   <mp:PhoneIdentity PhoneProductId="4a17bf37-6529-49ce-9766-08ae29130a83" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
