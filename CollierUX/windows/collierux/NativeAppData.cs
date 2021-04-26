@@ -12,13 +12,20 @@ using Windows.Storage;
 
 namespace collierux
 {
+    /// <summary>
+    /// Reads configuration data out of the common UWP data store location.  
+    /// This is used for storing front end configuraiton data for individual
+    /// user override without requiring recompilation.  For example, users can
+    /// change the threshold settings for a good / caution / danger state toggle,
+    /// or they can change the colors we use when we're in those states.  
+    /// 
+    /// The files can be reset to stock by deleting them and re-running the application.
+    /// We will persist out the application defaults when the file does not exist or has
+    /// no contents.  
+    /// </summary>
     [ReactModule("appData", EventEmitterName = "appDataEmitter")]
-    class AppDataModule
+    class NativeAppData
     {
-
-        [ReactConstant("Pi")]
-        public double PI = Math.PI;
-
         [ReactMethod("getAppSettings")]
         public async Task<string> GetAppSettingsAsync(string settingFileName, string defaultContent)
         {
@@ -77,45 +84,4 @@ namespace collierux
             }
         }
     }
-
-    /*
-    [ReactModule]
-    class FancyMath
-    {
-        [ReactConstant]
-        public double E = Math.E;
-
-        [ReactConstant("Pi")]
-        public double PI = Math.PI;
-
-        [ReactMethod("add")]
-        public double Add(double a, double b)
-        {
-            return AsyncContext.Run<double>(() => DoStuffAsync(a, b));
-        }
-
-        private async Task<double> DoStuffAsync(double a, double b)
-        {
-            return a + b + 1000;
-        }
-
-        [ReactEvent]
-        public Action<double> AddEvent { get; set; }
-
-        [ReactMethod]
-        public async Task<string> GetHttpResponseAsync(string uri)
-        {
-            var httpClient = new HttpClient();
-
-            // Send the GET request asynchronously
-            var httpResponseMessage = await httpClient.GetAsync(new Uri(uri));
-
-            var content = await httpResponseMessage.Content.ReadAsStringAsync();
-
-            return content;
-        }
-    }
-    */
-
-
 }
