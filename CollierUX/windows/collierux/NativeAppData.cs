@@ -24,7 +24,7 @@ namespace collierux
     /// no contents.  
     /// </summary>
     [ReactModule("appData", EventEmitterName = "appDataEmitter")]
-    class AppDataModule
+    class NativeAppData
     {
         [ReactMethod("getAppSettings")]
         public async Task<string> GetAppSettingsAsync(string settingFileName, string defaultContent)

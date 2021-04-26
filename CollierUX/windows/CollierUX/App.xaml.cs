@@ -32,6 +32,7 @@ namespace collierux
             PackageProviders.Add(new Microsoft.ReactNative.Managed.ReactPackageProvider());
             PackageProviders.Add(new ReactPackageProvider());
 
+            NativeLogging.ConfigureLogger();
             InitializeComponent();
         }
 
