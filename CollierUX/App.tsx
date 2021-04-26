@@ -12,6 +12,9 @@ import {
 } from './Collier/HubConnection';
 
 import { loadConfiguration, CollierConfig } from './Collier/Config';
+import { log } from './Collier/Logger';
+
+console.log = log;
 
 const CollierApp = () => {
   const hub_endpoint: string = 'http://localhost:9999/miner'; //TODO externalize to config
