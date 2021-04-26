@@ -10,6 +10,9 @@ using Windows.Storage;
 
 namespace collierux
 {
+    /// <summary>
+    /// Native logging for troubleshooting.  In release modes you do not have the ability to see console.log statements.
+    /// </summary>
     [ReactModule("nativeLogging", EventEmitterName = "nativeLoggingEmitter")]
     class NativeLogging
     {
