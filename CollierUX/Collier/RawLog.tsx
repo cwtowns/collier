@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { SafeAreaView, Text, FlatList, ListRenderItem } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
-import { v4 as uuidv4 } from 'uuid';
 
 import { NativeScrollEvent } from 'react-native';
 import { NativeSyntheticEvent } from 'react-native';
+import { NativeModules } from 'react-native';
 
 import { CollierConfig } from './Config';
 
@@ -52,24 +52,28 @@ const RawLog = (props: RawLogProps) => {
     const now: number = Date.now();
     const cutoff: number = now - maxBacklogTimeInMs;
 
-    let newLogArray: LogMessage[] = logArray.concat({
-      id: uuidv4(),
-      message: message,
-      timestamp: now,
+    NativeModules.nativeRandom.generateGuid(function (guid: string) {
+      setLogArray(arr => {
+        const newMessage: LogMessage = {
+          id: guid,
+          message: message,
+          timestamp: now,
+        };
+
+        let x: number = 0;
+        while (x < arr.length && arr[x].timestamp < cutoff) {
+          x++;
+        }
+        let newArray: LogMessage[];
+
+        if (x < arr.length) {
+          newArray = arr.slice(x).concat(newMessage);
+        } else {
+          newArray = arr.concat(newMessage);
+        }
+        return newArray;
+      });
     });
-
-    let x: number = 0;
-    while (x < newLogArray.length && newLogArray[x].timestamp < cutoff) {
-      x++;
-    }
-
-    if (x < newLogArray.length) {
-      setLogArray(newLogArray.slice(x));
-    } else {
-      setLogArray(newLogArray);
-    }
-
-    flatListRef.current?.scrollToEnd();
   };
 
   const checkToForceScrollToBottom = (_width: number, _height: number) => {
