@@ -8,7 +8,6 @@ namespace Collier.Monitoring.Gpu
 {
     public class NvidiaSmiParser : INvidiaSmiParser
     {
-        //TODO convert the 4 to a setting in the config file
         private readonly string BlankSpaceIndent = new String(' ', 4);
 
         public virtual JObject Parse(string data)

@@ -42,7 +42,6 @@ namespace Collier.Monitoring.Gpu
 
             var eventList = GetMonitoredProcesses(output);
 
-            //todo should this be async
             var e = new GpuProcessEvent(eventList);
             GpuActivityNoticed?.Invoke(this, e);
 

@@ -41,7 +41,6 @@ namespace Collier.Mining.Trex.OutputParsing
 
                 if (isNextMessageCrashCount)
                 {
-                    //TODO also need to look for the startup log message here, then I can actually deal with counting correctly
                     var match = _searchRegex.Match(message.Message);
 
                     if (!match.Success)

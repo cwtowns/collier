@@ -34,9 +34,6 @@ namespace Collier.Host
                 infoBroadcaster.MiningInformationChanged += InfoReceived;
             }
 
-            //TODO unclear if this is necessary or if i can simply return.
-            //I probably can as I assume the background service will persist 
-            //in memory now that I've done the wire-up to the event handlers
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(int.MaxValue, stoppingToken);
