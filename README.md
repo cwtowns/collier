@@ -10,6 +10,7 @@ There's a react-native windows front end to view the miner statistics.  It is no
 ## Setup
 * Download and follow the instructions on the [release page](https://github.com/cwtowns/collier/releases/tag/v1.0.9.0).  
 * Edit appsettings.json in the windows service directory and set a value for miner.t-rex.exeLocation
+* Edit appsettings.json to update your game paths and ignore paths to determine what processes stop mining activity (see example entries in the default file).  
 * Create a minersettings.private.json file in the windows service directory for your command line args to the miner.  This includes your address.  For example:
 
 ```
@@ -25,6 +26,8 @@ There's a react-native windows front end to view the miner statistics.  It is no
 Here's an example of the user interface
 
 ![user interface](https://i.imgur.com/jdm1sJf.png)
+
+You can manually stop mining by clicking on the power icon.  The windows service continues running while the miner itself is terminated.  
 
 Miner status will change colors depending on configured thresholds in the front end application.  These settings can be configured in the front end app data location.  Figuring this out on UWP is not straight forward.  On my system it is under %LOCALAPPDATA% in a directory with the guid the package was installed under.  After installing and running the front end, navigate to this directory and sort by date created and that's likely the app.  Under that location you have:
 * LocalState\config.json - threshold settings
