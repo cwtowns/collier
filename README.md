@@ -1,5 +1,5 @@
 # collier 
-A simple windows service for automating crypto miners.  
+A simple windows service and front end for automating crypto miners.  
 
 I mine Ether with my 3080 when its not doing anything else, and I've found that if I manually stop it to play games I often forget to restart it.  The service allows you to set a list of process paths that are treated as gaming activity.  If they show up as using the GPU, the miner will be stopped so you can game.  When those processes are no longer running, the miner will automatically start back up again.  
 
