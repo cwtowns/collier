@@ -34,16 +34,7 @@ namespace GrpcGreeter
         {
             _services = services;
 
-            var rootDirectory = Environment.GetEnvironmentVariable(CollierServiceCollectionExtensions.ENV_VARIABLE_COLLIER_ROOT_DIRECTORY) ??
-                                throw new ArgumentNullException("env." + CollierServiceCollectionExtensions.ENV_VARIABLE_COLLIER_ROOT_DIRECTORY,
-                                    "This is normally set during Main execution.");
-
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(rootDirectory)
-                .AddJsonFile("appsettings.json", optional: false)
-                .AddJsonFile("minersettings.private.json", optional: false)
-                .AddEnvironmentVariables()
-                .Build();
+            _configuration = Program.Config;
 
             //https://developer.okta.com/blog/2019/11/21/csharp-websockets-tutorial
             _services.AddSignalR();
