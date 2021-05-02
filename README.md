@@ -26,7 +26,10 @@ Here's an example of the user interface
 
 ![user interface](https://i.imgur.com/jdm1sJf.png)
 
-Miner status will change colors depending on configured thresholds in the front end application.  These settings can be configured in the front end install location.  Reach out if you need to do this.  Currently having problems determining the UWP install location post reinstall.  
+Miner status will change colors depending on configured thresholds in the front end application.  These settings can be configured in the front end app data location.  Figuring this out on UWP is not straight forward.  On my system it is under %LOCALAPPDATA% in a directory with the guid the package was installed under.  After installing and running the front end, navigate to this directory and sort by date created and that's likely the app.  Under that location you have:
+* LocalState\config.json - threshold settings
+* LocalState\theme.json - coloring
+* LocalState\logs\ - front end app log files
 
 ## Thoughts on React Native for Windows
 * They need better debuggging documentation.  For example:
@@ -40,7 +43,7 @@ Miner status will change colors depending on configured thresholds in the front 
 ## Thoughts on UWP
 
 * The windows service is not a UWP app, which is the new preferred way for deploying windows applications.  UWP automatically containerizes your app, which is great, but it isn't clear to me how to manage external dependencies.  I don't want to ship the miner with my app as that would require a new build every time a new miner is released.  Can external dependencies be managed via UWP?
-* The log files for the front end appear to be MIA post reinstall.  Finding out where the UWP app is installed to and what direcotries it uses is frustrating.  My default administrator account doesn't own any of the apps directories so drilling down into them via explorer isn't possible without changing ownership.  That doesn't give me good feelings.  
+* Figuring out the correct location the app is installed is difficult.  Navigating under some UWP folders isn't even allowed with your local admin account.  
 
 ### History
 
