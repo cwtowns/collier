@@ -30,10 +30,10 @@ Miner status will change colors depending on configured thresholds in the front 
 
 ## Thoughts on React Native for Windows
 * They need better debuggging documentation.  For example:
-  * how do you debug release builds.  Can you even get console.log statements?
-  * when should you be using the Visual Studio solution
-* The app crashes during hot swap.  A lot.  Once the app crashes I don't see a way to relaunch it without asking npm to run it again.  This slows down development a lot.
-* Some things work in debug mode and not in release mode and it isn't clear why.  For example, I developed with cryption.getRandomValues() and it worked fine until I went to publish a release.  I assume I'm picking this up in debug mode because that runs through Chrome, and I'm getting the browser's version.  Finding this out only when we create a production build is awful.
+  * how do you debug release builds?  Can you see console.log statements?
+  * when should you be using the Visual Studio solution?  
+* The app crashes during hot swap.  A lot.  Once the app crashes I don't see a way to relaunch it without asking npm to run it again.  This slows down development.  
+* Some things work in debug mode and not in release mode and it isn't clear why.  For example, I developed with crypto.getRandomValues() and it worked fine until I went to publish a release.  In release mode the module is missing.  I assume it's picking this up in debug mode because that runs through Chrome, and I'm getting the browser's version.  Finding this out only when we run a production build is not good.
 * Related to the above, [not all node native methods are present](https://github.com/parshap/node-libs-react-native#globals).  This makes using some libraries problematic.  
 * AirBnb dropped react-native stating, among other reasons, that they maintained multiple versions of their app code.  Native, Android, and iOS.  This was obvious from my experiment just on windows.  I have 3 native modules in this simple app to deal with file system access in UWP, handle the missing crypto module in release builds, and handle logging to disk since the platform appears to drop console.log entirely from release builds.  
 
