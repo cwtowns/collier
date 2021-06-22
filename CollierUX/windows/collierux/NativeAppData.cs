@@ -1,5 +1,6 @@
 ﻿using Microsoft.ReactNative.Managed;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using System;
 using System.Collections.Generic;
@@ -53,7 +54,16 @@ namespace collierux
                 var result = await FileIO.ReadTextAsync(storageFile);
 
                 if (result.Length > 0)
-                    return result;
+                {
+                    var mergedResult = MergeObjects(result, defaultContent);
+
+                    if (result.Equals(mergedResult))
+                        return result;
+
+                    await FileIO.WriteTextAsync(storageFile, JsonPrettify(mergedResult));
+                    return await FileIO.ReadTextAsync(storageFile);
+                }
+
             }
             catch (Exception e)
             {
@@ -70,6 +80,26 @@ namespace collierux
             {
                 throw;
             }
+        }
+
+        private static string MergeObjects(string onDiskContent, string defaultContent)
+        {
+            JObject onDiskObject = null;
+
+            try
+            {
+                onDiskObject = JObject.Parse(onDiskContent);
+            }
+            catch (Exception)
+            {
+                return defaultContent;
+            }
+
+            JObject defaultContentObject = JObject.Parse(defaultContent);
+
+            onDiskObject.Merge(defaultContentObject);
+
+            return onDiskObject.ToString();
         }
 
         private static string JsonPrettify(string json)
