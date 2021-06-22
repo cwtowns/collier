@@ -29,7 +29,6 @@ const RawLog = (props: RawLogProps) => {
   const maxBacklogTimeInMs: number =
     props.config.config.rawLog.backlog.maxBacklogTimeInMs;
   const flatListRef: React.RefObject<FlatList> = React.createRef<FlatList>();
-  const [hasUserScrolled, setHasUserScrolled] = useState(false);
   const [logArray, setLogArray] = useState([] as LogMessage[]);
   const [minerUpdateAvailable, setMinerUpdateAvailable] = useState(false);
 
@@ -60,35 +59,37 @@ const RawLog = (props: RawLogProps) => {
           timestamp: now,
         };
 
-        let x: number = 0;
-        while (x < arr.length && arr[x].timestamp < cutoff) {
-          x++;
-        }
         let newArray: LogMessage[];
 
-        if (x < arr.length) {
-          newArray = arr.slice(x).concat(newMessage);
-        } else {
-          newArray = arr.concat(newMessage);
+        //we invert the display of the list so newest messages are at the bottom.
+        //this means we put the newest at the start of the array here.
+        //this gives the best autoscroll behavior in flatlist (which is a little sad)
+        //https://github.com/necolas/react-native-web/issues/995
+        //i also didnt see a way to reverse this in custom programming because rn
+        //cannot tell me if a scroll event is from the wheel or data changing
+
+        let x: number = arr.length - 1;
+
+        if (x === -1) {
+          return [newMessage];
         }
+
+        while (arr[x].timestamp > cutoff && x > 0) {
+          x--;
+        }
+
+        if (x === 0) {
+          newArray = [...arr];
+        } else {
+          newArray = arr.slice(0, x);
+        }
+
+        newArray.unshift(newMessage);
+
+        console.log('new array length is ' + newArray.length);
         return newArray;
       });
     });
-  };
-
-  const checkToForceScrollToBottom = (_width: number, _height: number) => {
-    if (hasUserScrolled === false) {
-      flatListRef.current?.scrollToEnd();
-    }
-  };
-
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    let bottomCalculation: number =
-      e.nativeEvent.contentOffset.y + e.nativeEvent.layoutMeasurement.height;
-    let difference: number = Math.floor(
-      e.nativeEvent.contentSize.height - bottomCalculation,
-    );
-    setHasUserScrolled(difference > 0);
   };
 
   const renderItem: ListRenderItem<LogMessage> = ({ item }) => {
@@ -113,8 +114,7 @@ const RawLog = (props: RawLogProps) => {
         data={logArray}
         renderItem={renderCallback}
         keyExtractor={keyExtractor}
-        onScroll={onScroll}
-        onContentSizeChange={checkToForceScrollToBottom}
+        inverted
       />
     </SafeAreaView>
   );
