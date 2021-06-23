@@ -85,8 +85,6 @@ const RawLog = (props: RawLogProps) => {
         }
 
         newArray.unshift(newMessage);
-
-        console.log('new array length is ' + newArray.length);
         return newArray;
       });
     });
